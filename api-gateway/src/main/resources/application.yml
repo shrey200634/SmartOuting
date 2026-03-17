@@ -6,22 +6,46 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            # Wildcard — works on ANY localhost port (5173, 5177, any future port)
+            allowedOriginPatterns:
+              - "http://localhost:*"
+              - "http://127.0.0.1:*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - Authorization
+            allowCredentials: true
+            maxAge: 3600
+
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
       routes:
-        # Route 1: Identity
         - id: identity-service
           uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=/auth/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
-        # Route 2: Outing (MUST ALIGN WITH ROUTE 1)
         - id: outing-service
           uri: lb://OUTING-SERVICE
           predicates:
             - Path=/outing/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
 eureka:
   instance:
