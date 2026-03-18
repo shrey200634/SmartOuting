@@ -69,7 +69,7 @@ export default function GuardScanner() {
       {/* Scanner modal */}
       {showScanner&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9999,padding:20}}>
-          <div style={{background:"#fff",borderRadius:16,padding:24,maxWidth:480,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)"}}>
+          <div style={{background:"var(--bg-2)",borderRadius:16,padding:24,maxWidth:480,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
               <h3 style={{color:"var(--text-1)",fontSize:18,fontWeight:700}}>Scan QR Code</h3>
               <button onClick={()=>setShowScanner(false)} style={{width:30,height:30,borderRadius:8,background:"var(--bg-3)",border:"1px solid var(--border-2)",color:"var(--text-2)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>&times;</button>
@@ -119,10 +119,12 @@ export default function GuardScanner() {
 
       {/* MAIN */}
       <main style={{flex:1,background:"var(--bg)",padding:"36px 44px",overflow:"auto"}}>
-        <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:4}}>Gate Scanner</h1>
-        <p style={{color:"var(--text-3)",fontSize:14,marginBottom:32}}>Scan QR or enter ID manually</p>
+        <div style={{background:"linear-gradient(135deg, rgba(0,184,148,0.06), rgba(253,121,168,0.04))",borderRadius:16,padding:"24px 24px 20px",marginBottom:28,border:"1px solid rgba(0,184,148,0.10)"}}>
+          <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:4}}>Gate Scanner</h1>
+          <p style={{color:"var(--text-3)",fontSize:14}}>Scan QR or enter ID manually</p>
+        </div>
 
-        <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:18,padding:"40px 36px",textAlign:"center",maxWidth:560,boxShadow:"0 4px 20px rgba(0,0,0,0.06)",animation:"fadeIn 0.3s ease"}}>
+        <div style={{background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:18,padding:"40px 36px",textAlign:"center",maxWidth:560,boxShadow:"0 4px 20px rgba(0,0,0,0.06)",animation:"fadeIn 0.3s ease"}}>
           <div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#6C5CE7,#a29bfe)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px"}}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </div>
@@ -142,7 +144,7 @@ export default function GuardScanner() {
 
           <div style={{display:"flex",gap:10,justifyContent:"center"}}>
             <input value={outingId} onChange={e=>setOutingId(e.target.value)} onKeyDown={e=>e.key==="Enter"&&fetchOutingById()} placeholder="e.g. 42" type="number"
-              style={{padding:"14px 18px",background:"var(--bg-3)",border:"1.5px solid var(--border-2)",borderRadius:12,color:"var(--text-1)",fontSize:20,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",outline:"none",width:160,textAlign:"center",letterSpacing:"3px"}} />
+              style={{padding:"14px 18px",background:"var(--bg)",border:"1.5px solid var(--border-2)",borderRadius:12,color:"var(--text-1)",fontSize:20,fontWeight:700,fontFamily:"'JetBrains Mono',monospace",outline:"none",width:160,textAlign:"center",letterSpacing:"3px"}} />
             <button onClick={fetchOutingById} disabled={loading} style={{padding:"14px 24px",background:"var(--accent)",border:"none",borderRadius:12,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer"}}>
               {loading?"...":"Lookup"}
             </button>
@@ -203,7 +205,7 @@ export default function GuardScanner() {
 
         {/* Recent scans */}
         {recentScans.length>0&&(
-          <div style={{marginTop:28,background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:22,maxWidth:560,boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+          <div style={{marginTop:28,background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:14,padding:22,maxWidth:560,boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
             <h2 style={{fontSize:14,fontWeight:700,color:"var(--text-2)",textTransform:"uppercase",letterSpacing:"0.4px",marginBottom:14}}>Recent Scans</h2>
             {recentScans.map((s,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:i<recentScans.length-1?"1px solid var(--border)":"none"}}>
