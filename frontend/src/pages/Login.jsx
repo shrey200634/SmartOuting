@@ -34,7 +34,7 @@ export default function Login({ onSwitchToRegister }) {
   const inputStyle = (name) => ({
     width:"100%", padding:"14px 16px 14px 46px", borderRadius:12,
     border: `1.5px solid ${active===name ? "var(--accent)" : "var(--border-2)"}`,
-    background: "#fff",
+    background: "var(--bg-2)",
     boxShadow: active===name ? "0 0 0 4px rgba(108,92,231,0.08)" : "0 1px 3px rgba(0,0,0,0.04)",
     color:"var(--text-1)", fontSize:15, outline:"none", transition:"all 0.2s",
   });
@@ -105,7 +105,7 @@ export default function Login({ onSwitchToRegister }) {
       {/* RIGHT — Form Panel */}
       <div className={`fade-in ${mounted?"show":""}`} style={{
         flex:1, display:"flex", alignItems:"center", justifyContent:"center",
-        padding:"40px 52px", background:"var(--bg)",
+        padding:"40px 52px", background:"var(--bg-2)",
         transition:"opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s",
       }}>
         <div style={{width:"100%",maxWidth:400}}>

@@ -60,7 +60,7 @@ export default function Register({ onSwitchToLogin }) {
 
   const inputStyle = (name) => ({
     width:"100%", padding:"13px 16px 13px 44px",
-    background: "#fff",
+    background: "var(--bg)",
     border: `1.5px solid ${focused===name ? "var(--accent)" : "var(--border-2)"}`,
     boxShadow: focused===name ? "0 0 0 4px rgba(108,92,231,0.08)" : "0 1px 3px rgba(0,0,0,0.04)",
     borderRadius:12, color:"var(--text-1)", fontSize:14, outline:"none", transition:"all 0.2s",
@@ -74,7 +74,7 @@ export default function Register({ onSwitchToLogin }) {
         @keyframes spin { to{transform:rotate(360deg)} }
       `}</style>
 
-      <div style={{position:"relative",background:"#fff",border:"1px solid var(--border)",borderRadius:20,padding:"40px 40px",width:"100%",maxWidth:480,boxShadow:"0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04)",animation:"cardIn 0.5s ease"}}>
+      <div style={{position:"relative",background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:20,padding:"40px 40px",width:"100%",maxWidth:480,boxShadow:"0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04)",animation:"cardIn 0.5s ease"}}>
 
         {/* Brand */}
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24}}>
@@ -228,7 +228,7 @@ export default function Register({ onSwitchToLogin }) {
               </div>
 
               <div style={{display:"flex",gap:10,marginTop:4}}>
-                <button onClick={()=>setStep(1)} style={{padding:"13px 20px",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:12,color:"var(--text-2)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>Back</button>
+                <button onClick={()=>setStep(1)} style={{padding:"13px 20px",background:"var(--bg-2)",border:"1.5px solid var(--border-2)",borderRadius:12,color:"var(--text-2)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>Back</button>
                 <button onClick={handleSubmit} disabled={loading} style={{flex:1,padding:"13px",background:"var(--accent)",border:"none",borderRadius:12,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 14px rgba(108,92,231,0.3)",opacity:loading?0.7:1,fontFamily:"'Inter',sans-serif"}}>
                   {loading ? "Creating..." : "Create Account"}
                 </button>

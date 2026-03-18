@@ -10,20 +10,20 @@ html {
 }
 
 :root {
-  /* LIGHT THEME — warm & clean */
-  --bg:        #F7F7F5;
-  --bg-2:      #FFFFFF;
-  --bg-3:      #F0F0EE;
-  --bg-4:      #E8E8E5;
-  --border:    rgba(0,0,0,0.06);
+  /* LIGHT THEME — warm tinted, not plain white */
+  --bg:        #F4F2EE;
+  --bg-2:      #FAF9F7;
+  --bg-3:      #EFEEE9;
+  --bg-4:      #E4E2DD;
+  --border:    rgba(0,0,0,0.07);
   --border-2:  rgba(0,0,0,0.10);
   --border-3:  rgba(0,0,0,0.15);
 
   /* Text — rich warm darks */
   --text-1:    #1A1A1A;
   --text-2:    #4A4A4A;
-  --text-3:    #8A8A8A;
-  --text-4:    #B5B5B5;
+  --text-3:    #7A7A7A;
+  --text-4:    #AAAAAA;
 
   /* Primary — rich indigo-violet */
   --accent:    #6C5CE7;
@@ -37,16 +37,22 @@ html {
   --coral-dim: rgba(255,107,107,0.08);
 
   /* Status */
-  --amber:     #F0A500;
+  --amber:     #E8A317;
   --green:     #00B894;
   --red:       #E74C3C;
   --orange:    #F39C12;
   --purple:    #A29BFE;
 
   /* Sidebar — dark contrast */
-  --sidebar-bg: #1E1E2E;
+  --sidebar-bg: #1A1A2E;
   --sidebar-text: #C8C8D0;
-  --sidebar-active: rgba(108,92,231,0.15);
+  --sidebar-active: rgba(108,92,231,0.18);
+
+  /* Tinted section backgrounds */
+  --tint-purple: rgba(108,92,231,0.04);
+  --tint-green:  rgba(0,184,148,0.04);
+  --tint-amber:  rgba(240,165,0,0.04);
+  --tint-red:    rgba(231,76,60,0.04);
 }
 
 body {

@@ -20,7 +20,7 @@ export default function RoleSelector() {
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Inter',sans-serif",padding:20}}>
 
-      <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:20,padding:"40px 40px",width:"100%",maxWidth:500,boxShadow:"0 20px 60px rgba(0,0,0,0.08)"}}>
+      <div style={{background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:20,padding:"40px 40px",width:"100%",maxWidth:500,boxShadow:"0 20px 60px rgba(0,0,0,0.08)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
           <div style={{width:38,height:38,borderRadius:10,background:"var(--accent)",display:"flex",alignItems:"center",justifyContent:"center"}}>
             <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 2L28 8V16C28 22.627 22.627 28 16 30C9.373 28 4 22.627 4 16V8L16 2Z" fill="#fff"/><path d="M12 16L15 19L21 13" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -34,7 +34,7 @@ export default function RoleSelector() {
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
           {ROLES.map(r=>(
             <button key={r.value} onClick={()=>setUserRole(r.value)}
-              style={{display:"flex",alignItems:"center",gap:14,padding:"18px 20px",border:"1.5px solid var(--border)",borderRadius:14,cursor:"pointer",textAlign:"left",background:"#fff",transition:"all 0.2s",width:"100%",fontFamily:"'Inter',sans-serif",boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+              style={{display:"flex",alignItems:"center",gap:14,padding:"18px 20px",border:"1.5px solid var(--border)",borderRadius:14,cursor:"pointer",textAlign:"left",background:"var(--bg-2)",transition:"all 0.2s",width:"100%",fontFamily:"'Inter',sans-serif",boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
               <div style={{width:46,height:46,borderRadius:12,background:r.gradient,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",flexShrink:0}}>
                 <RoleIcon role={r.value} />
               </div>
