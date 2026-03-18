@@ -15,19 +15,19 @@ function AppContent() {
   if (loading) {
     return (
       <div style={{
-        minHeight: "100vh", background: "#060D1F",
+        minHeight: "100vh", background: "var(--bg)",
         display: "flex", alignItems: "center", justifyContent: "center",
         flexDirection: "column", gap: 16,
       }}>
         <div style={{
-          width: 44, height: 44,
-          border: "3px solid rgba(255,255,255,0.1)",
-          borderTopColor: "#F6C90E",
+          width: 40, height: 40,
+          border: "2.5px solid rgba(255,255,255,0.07)",
+          borderTopColor: "var(--accent)",
           borderRadius: "50%",
           animation: "spin 0.8s linear infinite",
         }} />
-        <p style={{ color: "#6b7280", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>
-          Loading SmartOuting...
+        <p style={{ color: "var(--text-3)", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>
+          Loading...
         </p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -41,7 +41,6 @@ function AppContent() {
     return <Login onSwitchToRegister={() => setAuthPage("register")} />;
   }
 
-  // Logged in — route by role
   const role = user.role;
   if (!role) return <RoleSelector />;
   if (role === "STUDENT") return <StudentPortal />;

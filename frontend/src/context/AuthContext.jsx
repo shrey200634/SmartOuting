@@ -3,6 +3,7 @@ import { authAPI } from "../utils/api";
 
 const AuthContext = createContext(null);
 
+// Decode JWT payload — role is now a claim inside the token
 function parseJwt(token) {
   try {
     const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
@@ -16,14 +17,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount: restore session
+  // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem("sos_token");
-    const savedUser = localStorage.getItem("sos_user");
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
+    const saved = localStorage.getItem("sos_user");
+    if (token && saved) {
+      try { setUser(JSON.parse(saved)); }
+      catch {
         localStorage.removeItem("sos_token");
         localStorage.removeItem("sos_user");
       }
@@ -31,14 +31,14 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // Login: backend returns raw JWT string
   const login = useCallback(async (username, password) => {
+    // Backend still returns a raw JWT string — unchanged
     const token = await authAPI.login(username, password);
     if (!token || typeof token !== "string") throw new Error("Invalid token received");
 
-    // Retrieve role from local role-map (saved at registration time)
-    const roleMap = JSON.parse(localStorage.getItem("sos_role_map") || "{}");
-    const role = roleMap[username.trim()] || null;
+    // Extract role directly from JWT claims — no localStorage role-map needed
+    const claims = parseJwt(token);
+    const role = claims?.role || null;
 
     const userData = { token, name: username.trim(), role };
     localStorage.setItem("sos_token", token);
@@ -47,7 +47,6 @@ export function AuthProvider({ children }) {
     return userData;
   }, []);
 
-  // After login, allow manual role set (for RoleSelector fallback)
   const setUserRole = useCallback((role) => {
     setUser((prev) => {
       if (!prev) return prev;
@@ -57,14 +56,8 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  // Register: saves role locally so login can retrieve it
   const register = useCallback(async (data) => {
-    const result = await authAPI.register(data);
-    // Save name → role mapping for login to pick up
-    const roleMap = JSON.parse(localStorage.getItem("sos_role_map") || "{}");
-    roleMap[data.name.trim()] = data.role;
-    localStorage.setItem("sos_role_map", JSON.stringify(roleMap));
-    return result;
+    return await authAPI.register(data);
   }, []);
 
   const logout = useCallback(() => {
