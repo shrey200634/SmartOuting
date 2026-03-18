@@ -10,23 +10,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService service;
+    @Autowired private AuthService service;
 
-    // 1. REGISTER (Sign Up)
     @PostMapping("/register")
     public String addNewUser(@RequestBody UserCredential user) {
         return service.saveUser(user);
     }
 
-    // 2. LOGIN (Get Token)
+    // Returns raw JWT string — exactly as before
     @PostMapping("/token")
     public String getToken(@RequestBody AuthRequest authRequest) {
-        // We now pass BOTH username and password to the service to verify manually
         return service.generateToken(authRequest.getUsername(), authRequest.getPassword());
     }
 
-    // 3. VALIDATE (Check Token)
     @GetMapping("/validate")
     public String validateToken(@RequestParam("token") String token) {
         service.validateToken(token);
