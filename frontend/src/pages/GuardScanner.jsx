@@ -113,7 +113,7 @@ export default function GuardScanner() {
   };
 
   const statusColor = {
-    PENDING: "#fbbf24", APPROVED: "#10b981", OUT: "#818cf8", OVERDUE: "#ef4444", RETURNED: "#9ca3af",
+    PENDING: "#fbbf24", APPROVED: "#10b981", OUT: "var(--accent)", OVERDUE: "#ef4444", RETURNED: "var(--text-3)",
   };
 
   return (
@@ -123,11 +123,11 @@ export default function GuardScanner() {
         <div style={styles.scannerOverlay}>
           <div style={styles.scannerModal}>
             <div style={styles.scannerHeader}>
-              <h3 style={{ color: "#f9fafb", fontSize: 18, fontWeight: 700 }}>📷 Scan QR Code</h3>
+              <h3 style={{ color: "var(--text-1)", fontSize: 18, fontWeight: 700 }}>📷 Scan QR Code</h3>
               <button onClick={() => setShowScanner(false)} style={styles.closeBtn}>✕</button>
             </div>
             <div id="qr-reader" style={{ width: "100%", borderRadius: 12 }}></div>
-            <p style={{ color: "#9ca3af", fontSize: 13, marginTop: 16, textAlign: "center" }}>
+            <p style={{ color: "var(--text-3)", fontSize: 13, marginTop: 16, textAlign: "center" }}>
               Point camera at student's QR code
             </p>
           </div>
@@ -141,23 +141,23 @@ export default function GuardScanner() {
             <div style={styles.brandIcon}>
               <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
                 <path d="M16 2L28 8V16C28 22.627 22.627 28 16 30C9.373 28 4 22.627 4 16V8L16 2Z" fill="url(#gg)" />
-                <path d="M12 16L15 19L21 13" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <defs><linearGradient id="gg" x1="4" y1="2" x2="28" y2="30"><stop stopColor="#F6C90E"/><stop offset="1" stopColor="#E8A000"/></linearGradient></defs>
+                <path d="M12 16L15 19L21 13" stroke="#0D1117" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <defs><linearGradient id="gg" x1="4" y1="2" x2="28" y2="30"><stop stopColor="#2DD4BF"/><stop offset="1" stopColor="#14B8A6"/></linearGradient></defs>
               </svg>
             </div>
             <div>
               <div style={styles.brandName}>SmartOuting</div>
-              <div style={{ fontSize: 11, color: "#10b981", marginTop: 1 }}>Guard Panel</div>
+              <div style={{ fontSize: 11, color: "var(--green)", marginTop: 1 }}>Guard Panel</div>
             </div>
           </div>
 
           <div style={styles.userCard}>
-            <div style={{ ...styles.avatar, background: "linear-gradient(135deg, #10b981, #059669)" }}>
+            <div style={{ ...styles.avatar, background: "linear-gradient(135deg, #22C55E, #16A34A)" }}>
               {user?.name?.[0]?.toUpperCase() || "G"}
             </div>
             <div>
-              <div style={{ color: "#f9fafb", fontWeight: 600, fontSize: 14 }}>{user?.name}</div>
-              <div style={{ color: "#10b981", fontSize: 12, marginTop: 2 }}>🛡️ Gate Guard</div>
+              <div style={{ color: "var(--text-1)", fontWeight: 600, fontSize: 14 }}>{user?.name}</div>
+              <div style={{ color: "var(--green)", fontSize: 12, marginTop: 2 }}>🛡️ Gate Guard</div>
             </div>
           </div>
 
@@ -172,7 +172,7 @@ export default function GuardScanner() {
             ].map((step, i) => (
               <div key={i} style={styles.instructStep}>
                 <span style={styles.instructNum}>{i + 1}</span>
-                <span style={{ fontSize: 12, color: "#9ca3af" }}>{step}</span>
+                <span style={{ fontSize: 12, color: "var(--text-3)" }}>{step}</span>
               </div>
             ))}
           </div>
@@ -234,21 +234,21 @@ export default function GuardScanner() {
             <div style={{
               ...styles.resultCard,
               borderColor: scanResult.type === "success" ? "rgba(16,185,129,0.3)"
-                : scanResult.error ? "rgba(239,68,68,0.3)" : "rgba(246,201,14,0.2)",
+                : scanResult.error ? "rgba(239,68,68,0.3)" : "rgba(45,212,191,0.2)",
             }}>
               {scanResult.error ? (
                 <div style={{ textAlign: "center", padding: "8px 0" }}>
                   <div style={{ fontSize: 36, marginBottom: 8 }}>🚫</div>
-                  <div style={{ color: "#ef4444", fontWeight: 700, fontSize: 15 }}>{scanResult.error}</div>
+                  <div style={{ color: "var(--red)", fontWeight: 700, fontSize: 15 }}>{scanResult.error}</div>
                 </div>
               ) : (
                 <>
                   <div style={styles.resultHeader}>
                     <div>
-                      <div style={{ color: "#f9fafb", fontSize: 18, fontWeight: 800 }}>
+                      <div style={{ color: "var(--text-1)", fontSize: 18, fontWeight: 800 }}>
                         {scanResult.data.studentName}
                       </div>
-                      <div style={{ color: "#6b7280", fontSize: 12, marginTop: 2 }}>ID: {scanResult.data.studentId}</div>
+                      <div style={{ color: "var(--text-3)", fontSize: 12, marginTop: 2 }}>ID: {scanResult.data.studentId}</div>
                     </div>
                     <span style={{
                       padding: "6px 14px", borderRadius: 99, fontSize: 11, fontWeight: 700,
@@ -283,8 +283,8 @@ export default function GuardScanner() {
                     <div style={styles.successBanner}>
                       <div style={{ fontSize: 24 }}>✅</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ color: "#10b981", fontWeight: 700, fontSize: 14 }}>Marked OUT</div>
-                        <div style={{ color: "#6b7280", fontSize: 12, marginTop: 2 }}>Parent email sent</div>
+                        <div style={{ color: "var(--green)", fontWeight: 700, fontSize: 14 }}>Marked OUT</div>
+                        <div style={{ color: "var(--text-3)", fontSize: 12, marginTop: 2 }}>Parent email sent</div>
                       </div>
                     </div>
                   )}
@@ -293,8 +293,8 @@ export default function GuardScanner() {
                     <div style={styles.returnedBanner}>
                       <div style={{ fontSize: 24 }}>🏠</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ color: "#818cf8", fontWeight: 700, fontSize: 14 }}>Marked RETURNED</div>
-                        <div style={{ color: "#6b7280", fontSize: 12, marginTop: 2 }}>Student back on campus</div>
+                        <div style={{ color: "var(--accent)", fontWeight: 700, fontSize: 14 }}>Marked RETURNED</div>
+                        <div style={{ color: "var(--text-3)", fontSize: 12, marginTop: 2 }}>Student back on campus</div>
                       </div>
                     </div>
                   )}
@@ -336,10 +336,10 @@ export default function GuardScanner() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {recentScans.map((s, i) => (
                 <div key={i} style={styles.recentItem}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: s.eventType === "IN" ? "#818cf8" : "#10b981", flexShrink: 0 }} />
-                  <span style={{ color: "#f9fafb", fontWeight: 600, fontSize: 13 }}>{s.studentName}</span>
-                  <span style={{ color: "#6b7280", fontSize: 12 }}>→ {s.destination}</span>
-                  <span style={{ marginLeft: "auto", color: s.eventType === "IN" ? "#818cf8" : "#10b981", fontSize: 11 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: s.eventType === "IN" ? "var(--accent)" : "var(--green)", flexShrink: 0 }} />
+                  <span style={{ color: "var(--text-1)", fontWeight: 600, fontSize: 13 }}>{s.studentName}</span>
+                  <span style={{ color: "var(--text-3)", fontSize: 12 }}>→ {s.destination}</span>
+                  <span style={{ marginLeft: "auto", color: s.eventType === "IN" ? "var(--accent)" : "var(--green)", fontSize: 11 }}>
                     {s.eventType} • {s.scannedAt?.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -352,9 +352,9 @@ export default function GuardScanner() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #060D1F; }
+        body { background: var(--bg); }
         input { color-scheme: dark; }
-        input::placeholder { color: #4b5563; }
+        input::placeholder { color: var(--text-4); }
         input[type=number]::-webkit-outer-spin-button,
         input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         @keyframes pulse { 0%,100%{transform:scale(1);opacity:0.4} 50%{transform:scale(1.15);opacity:0.15} }
@@ -366,89 +366,89 @@ export default function GuardScanner() {
 }
 
 const styles = {
-  layout: { display: "flex", minHeight: "100vh", background: "#060D1F", fontFamily: "'DM Sans', sans-serif" },
+  layout: { display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "'Plus Jakarta Sans', sans-serif" },
   sidebar: {
-    width: 260, background: "rgba(10,18,40,0.98)", borderRight: "1px solid rgba(255,255,255,0.06)",
+    width: 260, background: "rgba(13,17,23,0.98)", borderRight: "1px solid var(--border)",
     display: "flex", flexDirection: "column", justifyContent: "space-between",
     padding: "24px 16px", position: "sticky", top: 0, height: "100vh", flexShrink: 0,
   },
   brand: { display: "flex", alignItems: "center", gap: 12, padding: "0 8px", marginBottom: 20 },
   brandIcon: {
-    width: 40, height: 40, borderRadius: 12, background: "rgba(246,201,14,0.1)",
-    border: "1px solid rgba(246,201,14,0.2)", display: "flex", alignItems: "center", justifyContent: "center",
+    width: 40, height: 40, borderRadius: 12, background: "var(--accent-dim)",
+    border: "1px solid rgba(45,212,191,0.25)", display: "flex", alignItems: "center", justifyContent: "center",
   },
-  brandName: { fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, color: "#F6C90E" },
+  brandName: { fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: "var(--accent)" },
   userCard: {
     display: "flex", alignItems: "center", gap: 12, padding: "12px 16px",
-    background: "rgba(16,185,129,0.06)", borderRadius: 12, border: "1px solid rgba(16,185,129,0.15)", marginBottom: 24,
+    background: "rgba(34,197,94,0.06)", borderRadius: 12, border: "1px solid rgba(34,197,94,0.15)", marginBottom: 24,
   },
   avatar: {
     width: 36, height: 36, borderRadius: "50%", color: "white", fontWeight: 800, fontSize: 15,
-    display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif",
+    display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
   instructions: {
     background: "rgba(255,255,255,0.02)", borderRadius: 12,
     border: "1px solid rgba(255,255,255,0.05)", padding: 16, display: "flex", flexDirection: "column", gap: 10,
   },
-  instructTitle: { fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 },
+  instructTitle: { fontSize: 11, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 4 },
   instructStep: { display: "flex", alignItems: "flex-start", gap: 10 },
   instructNum: {
-    width: 20, height: 20, borderRadius: "50%", background: "rgba(246,201,14,0.1)",
-    border: "1px solid rgba(246,201,14,0.2)", color: "#F6C90E", fontSize: 10, fontWeight: 700,
+    width: 20, height: 20, borderRadius: "50%", background: "var(--accent-dim)",
+    border: "1px solid rgba(45,212,191,0.25)", color: "var(--accent)", fontSize: 10, fontWeight: 700,
     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1,
   },
   logoutBtn: {
     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
     padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.15)",
-    background: "rgba(239,68,68,0.05)", color: "#ef4444", fontSize: 13,
-    cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+    background: "rgba(239,68,68,0.05)", color: "var(--red)", fontSize: 13,
+    cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif",
   },
   main: { flex: 1, padding: "40px 48px", overflow: "auto" },
   pageHeader: { marginBottom: 36 },
-  pageTitle: { fontFamily: "'Syne', sans-serif", fontSize: 28, fontWeight: 800, color: "#f9fafb" },
-  pageSub: { color: "#6b7280", fontSize: 14, marginTop: 6 },
+  pageTitle: { fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 28, fontWeight: 800, color: "var(--text-1)" },
+  pageSub: { color: "var(--text-3)", fontSize: 14, marginTop: 6 },
   scanCard: {
-    background: "rgba(10,18,40,0.9)", border: "1px solid rgba(16,185,129,0.15)",
+    background: "rgba(13,17,23,0.9)", border: "1px solid rgba(34,197,94,0.15)",
     borderRadius: 24, padding: "48px 40px", textAlign: "center", maxWidth: 600,
     position: "relative", overflow: "hidden", boxShadow: "0 16px 60px rgba(0,0,0,0.4)", animation: "fadeIn 0.4s ease",
   },
   pulseWrap: { position: "relative", width: 80, height: 80, margin: "0 auto 24px" },
   pulseRing1: {
     position: "absolute", inset: 0, borderRadius: "50%",
-    background: "rgba(16,185,129,0.15)", animation: "pulse 2.5s ease-in-out infinite",
+    background: "rgba(34,197,94,0.15)", animation: "pulse 2.5s ease-in-out infinite",
   },
   pulseRing2: {
     position: "absolute", inset: -12, borderRadius: "50%",
-    background: "rgba(16,185,129,0.07)", animation: "pulse2 2.5s ease-in-out infinite",
+    background: "rgba(34,197,94,0.07)", animation: "pulse2 2.5s ease-in-out infinite",
   },
   scanIcon: {
     position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
     fontSize: 32, zIndex: 1,
   },
-  scanTitle: { fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: "#f9fafb", marginBottom: 8 },
-  scanSub: { color: "#6b7280", fontSize: 14, marginBottom: 28 },
+  scanTitle: { fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 800, color: "var(--text-1)", marginBottom: 8 },
+  scanSub: { color: "var(--text-3)", fontSize: 14, marginBottom: 28 },
   qrScanBtn: {
     width: "100%", maxWidth: 400, margin: "0 auto", padding: "18px 32px",
-    background: "linear-gradient(135deg, #10b981, #059669)",
+    background: "linear-gradient(135deg, #22C55E, #16A34A)",
     border: "none", borderRadius: 16, color: "white", fontSize: 16, fontWeight: 700,
-    fontFamily: "'Syne', sans-serif", cursor: "pointer",
+    fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: "pointer",
     boxShadow: "0 8px 28px rgba(16,185,129,0.4)",
   },
   divider: { display: "flex", alignItems: "center", gap: 16, margin: "24px 0" },
   dividerLine: { flex: 1, height: 1, background: "rgba(255,255,255,0.1)" },
-  dividerText: { color: "#6b7280", fontSize: 12, fontWeight: 600 },
+  dividerText: { color: "var(--text-3)", fontSize: 12, fontWeight: 600 },
   inputRow: { display: "flex", gap: 12, justifyContent: "center" },
   scanInput: {
     padding: "14px 20px", background: "rgba(255,255,255,0.05)",
-    border: "2px solid rgba(16,185,129,0.2)", borderRadius: 14,
-    color: "#f9fafb", fontSize: 20, fontWeight: 700,
-    fontFamily: "'Syne', sans-serif", outline: "none", width: 180,
+    border: "2px solid rgba(34,197,94,0.2)", borderRadius: 14,
+    color: "var(--text-1)", fontSize: 20, fontWeight: 700,
+    fontFamily: "'Plus Jakarta Sans', sans-serif", outline: "none", width: 180,
     textAlign: "center", letterSpacing: "2px",
   },
   fetchBtn: {
-    padding: "14px 28px", background: "linear-gradient(135deg, #6b7280, #4b5563)",
-    border: "none", borderRadius: 14, color: "white", fontSize: 15, fontWeight: 700,
-    fontFamily: "'Syne', sans-serif", cursor: "pointer",
+    padding: "14px 28px", background: "var(--bg-3)",
+    border: "1.5px solid var(--border-2)", borderRadius: 14, color: "var(--text-2)", fontSize: 15, fontWeight: 700,
+    cursor: "pointer",
   },
   scannerOverlay: {
     position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
@@ -456,7 +456,7 @@ const styles = {
     zIndex: 9999, padding: 20,
   },
   scannerModal: {
-    background: "rgba(10,18,40,0.98)", border: "1px solid rgba(16,185,129,0.2)",
+    background: "rgba(13,17,23,0.98)", border: "1px solid rgba(34,197,94,0.2)",
     borderRadius: 20, padding: 24, maxWidth: 500, width: "100%",
     boxShadow: "0 20px 80px rgba(0,0,0,0.6)",
   },
@@ -466,7 +466,7 @@ const styles = {
   closeBtn: {
     width: 32, height: 32, borderRadius: "50%",
     background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
-    color: "#ef4444", fontSize: 18, cursor: "pointer",
+    color: "var(--red)", fontSize: 18, cursor: "pointer",
     display: "flex", alignItems: "center", justifyContent: "center",
   },
   resultCard: {
@@ -476,24 +476,24 @@ const styles = {
   resultHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
   resultGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 },
   resultItem: { display: "flex", flexDirection: "column", gap: 4 },
-  resultLabel: { fontSize: 10, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" },
-  resultValue: { fontSize: 13, color: "#e5e7eb" },
+  resultLabel: { fontSize: 10, fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.5px" },
+  resultValue: { fontSize: 13, color: "var(--text-2)" },
   markOutBtn: {
     width: "100%", marginTop: 20, padding: "16px 24px",
-    background: "linear-gradient(135deg, #10b981, #059669)",
+    background: "linear-gradient(135deg, #22C55E, #16A34A)",
     border: "none", borderRadius: 12, color: "white", fontSize: 15, fontWeight: 700,
-    fontFamily: "'Syne', sans-serif", cursor: "pointer", boxShadow: "0 8px 28px rgba(16,185,129,0.35)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: "pointer", boxShadow: "0 8px 28px rgba(16,185,129,0.35)",
   },
   markInBtn: {
     width: "100%", marginTop: 20, padding: "16px 24px",
-    background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    background: "linear-gradient(135deg, #2DD4BF, #14B8A6)",
     border: "none", borderRadius: 12, color: "white", fontSize: 15, fontWeight: 700,
-    fontFamily: "'Syne', sans-serif", cursor: "pointer", boxShadow: "0 8px 28px rgba(99,102,241,0.35)",
+    fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: "pointer", boxShadow: "0 8px 28px rgba(45,212,191,0.3)",
   },
   successBanner: {
     marginTop: 16, display: "flex", alignItems: "center", gap: 12,
-    padding: "14px 18px", background: "rgba(16,185,129,0.1)",
-    border: "1px solid rgba(16,185,129,0.25)", borderRadius: 10,
+    padding: "14px 18px", background: "rgba(34,197,94,0.1)",
+    border: "1px solid rgba(34,197,94,0.25)", borderRadius: 10,
   },
   returnedBanner: {
     marginTop: 16, display: "flex", alignItems: "center", gap: 12,
@@ -506,11 +506,11 @@ const styles = {
     border: "1px solid rgba(251,191,36,0.2)", borderRadius: 10,
   },
   recentSection: {
-    marginTop: 32, background: "rgba(10,18,40,0.7)", border: "1px solid rgba(255,255,255,0.07)",
+    marginTop: 32, background: "rgba(13,17,23,0.7)", border: "1px solid rgba(255,255,255,0.07)",
     borderRadius: 16, padding: 24, maxWidth: 600,
   },
   recentTitle: {
-    fontFamily: "'Syne', sans-serif", fontSize: 14, fontWeight: 700, color: "#9ca3af",
+    fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: "var(--text-3)",
     textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 16,
   },
   recentItem: {

@@ -5,10 +5,10 @@ import { useToast } from "../components/Toast";
 
 const STATUS_COLORS = {
   PENDING:  { bg: "rgba(251,191,36,0.12)",  color: "#fbbf24", border: "rgba(251,191,36,0.25)" },
-  APPROVED: { bg: "rgba(16,185,129,0.12)",  color: "#10b981", border: "rgba(16,185,129,0.25)" },
+  APPROVED: { bg: "rgba(16,185,129,0.12)",  color: "var(--green)", border: "rgba(16,185,129,0.25)" },
   OUT:      { bg: "rgba(59,130,246,0.12)",  color: "#60a5fa", border: "rgba(59,130,246,0.25)" },
   OVERDUE:  { bg: "rgba(239,68,68,0.12)",   color: "#ef4444", border: "rgba(239,68,68,0.25)" },
-  RETURNED: { bg: "rgba(156,163,175,0.12)", color: "#9ca3af", border: "rgba(156,163,175,0.25)" },
+  RETURNED: { bg: "rgba(156,163,175,0.12)", color: "var(--text-3)", border: "rgba(156,163,175,0.25)" },
 };
 
 const FLAG_COLORS = {
@@ -117,8 +117,8 @@ export default function StudentPortal() {
             <div style={styles.brandIcon}>
               <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
                 <path d="M16 2L28 8V16C28 22.627 22.627 28 16 30C9.373 28 4 22.627 4 16V8L16 2Z" fill="url(#g1)" />
-                <path d="M12 16L15 19L21 13" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <defs><linearGradient id="g1" x1="4" y1="2" x2="28" y2="30"><stop stopColor="#F6C90E"/><stop offset="1" stopColor="#E8A000"/></linearGradient></defs>
+                <path d="M12 16L15 19L21 13" stroke="#0D1117" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <defs><linearGradient id="g1" x1="4" y1="2" x2="28" y2="30"><stop stopColor="#2DD4BF"/><stop offset="1" stopColor="#14B8A6"/></linearGradient></defs>
               </svg>
             </div>
             <div>
@@ -130,8 +130,8 @@ export default function StudentPortal() {
           <div style={styles.userCard}>
             <div style={styles.avatar}>{user?.name?.[0]?.toUpperCase() || "S"}</div>
             <div>
-              <div style={{ color: "#f9fafb", fontWeight: 600, fontSize: 14 }}>{user?.name}</div>
-              <div style={{ color: "#6b7280", fontSize: 12, marginTop: 2 }}>🎓 Student</div>
+              <div style={{ color: "var(--text-1)", fontWeight: 600, fontSize: 14 }}>{user?.name}</div>
+              <div style={{ color: "var(--text-3)", fontSize: 12, marginTop: 2 }}>🎓 Student</div>
             </div>
           </div>
 
@@ -191,8 +191,8 @@ export default function StudentPortal() {
               <div style={styles.formFooter}>
                 <div style={styles.aiNote}>
                   <span style={{ fontSize: 18 }}>🤖</span>
-                  <span style={{ fontSize: 13, color: "#9ca3af" }}>
-                    Your request will be <strong style={{ color: "#F6C90E" }}>AI-analysed</strong> for urgency and automatically flagged for the warden.
+                  <span style={{ fontSize: 13, color: "var(--text-3)" }}>
+                    Your request will be <strong style={{ color: "var(--accent)" }}>AI-analysed</strong> for urgency and automatically flagged for the warden.
                   </span>
                 </div>
                 <button type="submit" disabled={submitting} style={{ ...styles.submitBtn, opacity: submitting ? 0.8 : 1 }}>
@@ -226,16 +226,16 @@ export default function StudentPortal() {
 
             {historyLoading && (
               <div style={{ textAlign: "center", padding: 40 }}>
-                <div style={{ width: 32, height: 32, border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "#F6C90E", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }} />
-                <p style={{ color: "#6b7280", fontSize: 13 }}>Loading requests...</p>
+                <div style={{ width: 32, height: 32, border: "3px solid rgba(255,255,255,0.1)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }} />
+                <p style={{ color: "var(--text-3)", fontSize: 13 }}>Loading requests...</p>
               </div>
             )}
 
             {!historyLoading && history.length === 0 && (
               <div style={styles.emptyState}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📭</div>
-                <div style={{ color: "#f9fafb", fontWeight: 600, fontSize: 16 }}>No requests found</div>
-                <div style={{ color: "#6b7280", fontSize: 13, marginTop: 6 }}>Apply for your first outing or check your Student ID.</div>
+                <div style={{ color: "var(--text-1)", fontWeight: 600, fontSize: 16 }}>No requests found</div>
+                <div style={{ color: "var(--text-3)", fontSize: 13, marginTop: 6 }}>Apply for your first outing or check your Student ID.</div>
               </div>
             )}
 
@@ -244,13 +244,13 @@ export default function StudentPortal() {
                 <div key={o.id} style={styles.historyCard}>
                   <div style={styles.historyTop}>
                     <div>
-                      <div style={{ color: "#f9fafb", fontWeight: 700, fontSize: 15 }}>#{o.id} — {o.destination}</div>
-                      <div style={{ color: "#6b7280", fontSize: 12, marginTop: 4 }}>{o.reason}</div>
+                      <div style={{ color: "var(--text-1)", fontWeight: 700, fontSize: 15 }}>#{o.id} — {o.destination}</div>
+                      <div style={{ color: "var(--text-3)", fontSize: 12, marginTop: 4 }}>{o.reason}</div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
                       <StatusBadge status={o.status} />
                       {o.aiFlag && (
-                        <span style={{ fontSize: 11, color: FLAG_COLORS[o.aiFlag] || "#9ca3af", fontWeight: 600 }}>
+                        <span style={{ fontSize: 11, color: FLAG_COLORS[o.aiFlag] || "var(--text-3)", fontWeight: 600 }}>
                           🤖 {o.aiFlag} (Score: {o.urgencyScore})
                         </span>
                       )}
@@ -262,10 +262,10 @@ export default function StudentPortal() {
                     {o.wardenComment && <span>💬 &quot;{o.wardenComment}&quot;</span>}
                   </div>
                   {o.qrCodeUrl && (o.status === "APPROVED") && (
-                    <div style={{ marginTop: 12, padding: 16, background: "rgba(16,185,129,0.06)", borderRadius: 10, border: "1px solid rgba(16,185,129,0.15)" }}>
-                      <div style={{ color: "#10b981", fontSize: 12, fontWeight: 700, marginBottom: 10 }}>✓ APPROVED — Show this QR to guard at the gate</div>
+                    <div style={{ marginTop: 12, padding: 16, background: "rgba(34,197,94,0.06)", borderRadius: 10, border: "1px solid rgba(34,197,94,0.2)" }}>
+                      <div style={{ color: "var(--green)", fontSize: 12, fontWeight: 700, marginBottom: 10 }}>✓ APPROVED — Show this QR to guard at the gate</div>
                       <img src={o.qrCodeUrl} alt="QR Code" style={{ width: 120, height: 120, borderRadius: 8, background: "white", padding: 4 }} />
-                      <div style={{ color: "#6b7280", fontSize: 11, marginTop: 8 }}>Outing ID: #{o.id}</div>
+                      <div style={{ color: "var(--text-3)", fontSize: 11, marginTop: 8 }}>Outing ID: #{o.id}</div>
                     </div>
                   )}
                 </div>
@@ -276,11 +276,10 @@ export default function StudentPortal() {
       </main>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #060D1F; }
+        body { background: var(--bg); }
         input, textarea, select { color-scheme: dark; }
-        textarea::placeholder, input::placeholder { color: #4b5563; }
+        textarea::placeholder, input::placeholder { color: var(--text-4); }
         @keyframes fadeIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin    { to { transform: rotate(360deg); } }
       `}</style>
@@ -298,36 +297,36 @@ function Field({ label, name, value, onChange, type = "text", placeholder, icon,
 }
 
 const styles = {
-  layout: { display: "flex", minHeight: "100vh", background: "#060D1F", fontFamily: "'DM Sans', sans-serif" },
-  sidebar: { width: 260, background: "rgba(10,18,40,0.95)", borderRight: "1px solid rgba(255,255,255,0.06)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "24px 16px", position: "sticky", top: 0, height: "100vh", flexShrink: 0 },
-  sideTop: { display: "flex", flexDirection: "column", gap: 24 },
-  brandRow: { display: "flex", alignItems: "center", gap: 12, padding: "0 8px" },
-  brandIcon: { width: 40, height: 40, borderRadius: 12, background: "rgba(246,201,14,0.1)", border: "1px solid rgba(246,201,14,0.2)", display: "flex", alignItems: "center", justifyContent: "center" },
-  brandName: { fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700, color: "#F6C90E" },
-  brandRole: { fontSize: 11, color: "#6b7280", marginTop: 1 },
-  userCard: { display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: "rgba(255,255,255,0.03)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)" },
-  avatar: { width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #F6C90E, #E8A000)", color: "#060D1F", fontWeight: 800, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Syne', sans-serif" },
-  nav: { display: "flex", flexDirection: "column", gap: 4 },
-  navBtn: { display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", borderRadius: 10, border: "1px solid transparent", background: "none", color: "#6b7280", fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s", textAlign: "left" },
-  navBtnActive: { background: "rgba(246,201,14,0.1)", color: "#F6C90E", border: "1px solid rgba(246,201,14,0.2)" },
-  logoutBtn: { display: "flex", alignItems: "center", gap: 8, padding: "11px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)", background: "none", color: "#6b7280", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" },
+  layout: { display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "'Plus Jakarta Sans', sans-serif" },
+  sidebar: { width: 256, background: "var(--bg-2)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "24px 16px", position: "sticky", top: 0, height: "100vh", flexShrink: 0 },
+  sideTop: { display: "flex", flexDirection: "column", gap: 22 },
+  brandRow: { display: "flex", alignItems: "center", gap: 10, padding: "0 6px" },
+  brandIcon: { width: 38, height: 38, borderRadius: 10, background: "var(--accent-dim)", border: "1px solid rgba(45,212,191,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  brandName: { fontSize: 14, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.2px" },
+  brandRole: { fontSize: 10, color: "var(--text-4)", marginTop: 1 },
+  userCard: { display: "flex", alignItems: "center", gap: 11, padding: "11px 14px", background: "var(--bg-3)", borderRadius: 10, border: "1px solid var(--border)" },
+  avatar: { width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #2DD4BF, #14B8A6)", color: "#0D1117", fontWeight: 800, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  nav: { display: "flex", flexDirection: "column", gap: 2 },
+  navBtn: { display: "flex", alignItems: "center", gap: 9, padding: "10px 14px", borderRadius: 9, border: "1px solid transparent", background: "none", color: "var(--text-3)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "all 0.2s", textAlign: "left", width: "100%" },
+  navBtnActive: { background: "var(--accent-dim)", color: "var(--accent)", border: "1px solid rgba(45,212,191,0.2)", fontWeight: 700 },
+  logoutBtn: { display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 9, border: "1px solid var(--border-2)", background: "none", color: "var(--text-4)", fontSize: 13, cursor: "pointer", transition: "all 0.2s", width: "100%" },
   main: { flex: 1, overflow: "auto", padding: "32px 40px" },
   content: { maxWidth: 860, margin: "0 auto", animation: "fadeIn 0.4s ease" },
   pageHeader: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 16 },
-  pageTitle: { fontFamily: "'Syne', sans-serif", fontSize: 26, fontWeight: 800, color: "#f9fafb" },
-  pageDesc: { color: "#6b7280", fontSize: 14, marginTop: 4 },
-  formCard: { background: "rgba(10,18,40,0.8)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: 32, boxShadow: "0 8px 40px rgba(0,0,0,0.3)" },
-  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 },
-  fieldLabel: { display: "block", fontSize: 12, fontWeight: 600, color: "#9ca3af", letterSpacing: "0.5px", textTransform: "uppercase", marginBottom: 8 },
-  formInput: { width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)", borderRadius: 10, color: "#f9fafb", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", transition: "border-color 0.2s" },
-  textarea: { width: "100%", padding: "12px 16px", resize: "vertical", background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.08)", borderRadius: 10, color: "#f9fafb", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none" },
+  pageTitle: { fontSize: 24, fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.5px" },
+  pageDesc: { color: "var(--text-3)", fontSize: 14, marginTop: 4 },
+  formCard: { background: "var(--bg-2)", border: "1px solid var(--border-2)", borderRadius: 16, padding: 28, boxShadow: "0 4px 24px rgba(0,0,0,0.25)" },
+  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 22 },
+  fieldLabel: { display: "block", fontSize: 11, fontWeight: 700, color: "var(--text-3)", letterSpacing: "0.6px", textTransform: "uppercase", marginBottom: 7 },
+  formInput: { width: "100%", padding: "11px 14px", background: "var(--bg-3)", border: "1.5px solid var(--border-2)", borderRadius: 9, color: "var(--text-1)", fontSize: 14, outline: "none", transition: "border-color 0.2s, box-shadow 0.2s" },
+  textarea: { width: "100%", padding: "11px 14px", resize: "vertical", background: "var(--bg-3)", border: "1.5px solid var(--border-2)", borderRadius: 9, color: "var(--text-1)", fontSize: 14, outline: "none" },
   formFooter: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" },
-  aiNote: { display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "rgba(246,201,14,0.05)", border: "1px solid rgba(246,201,14,0.12)", borderRadius: 10, flex: 1 },
-  submitBtn: { padding: "14px 28px", background: "linear-gradient(135deg, #F6C90E, #E8A000)", border: "none", borderRadius: 12, color: "#060D1F", fontSize: 14, fontWeight: 700, fontFamily: "'Syne', sans-serif", cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 6px 20px rgba(246,201,14,0.3)" },
-  searchInput: { padding: "10px 16px", background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#f9fafb", fontSize: 14, fontFamily: "'DM Sans', sans-serif", outline: "none", width: 200 },
-  searchBtn: { padding: "10px 20px", background: "rgba(246,201,14,0.1)", border: "1.5px solid rgba(246,201,14,0.25)", borderRadius: 10, color: "#F6C90E", fontSize: 13, fontWeight: 600, fontFamily: "'Syne', sans-serif", cursor: "pointer" },
-  emptyState: { textAlign: "center", padding: "80px 20px", background: "rgba(10,18,40,0.5)", borderRadius: 20, border: "1px dashed rgba(255,255,255,0.08)" },
-  historyCard: { background: "rgba(10,18,40,0.8)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, padding: "20px 24px", transition: "border-color 0.2s", animation: "fadeIn 0.3s ease" },
+  aiNote: { display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", background: "var(--accent-dim)", border: "1px solid rgba(45,212,191,0.2)", borderRadius: 9, flex: 1 },
+  submitBtn: { padding: "13px 24px", background: "linear-gradient(135deg, #2DD4BF, #14B8A6)", border: "none", borderRadius: 10, color: "#0D1117", fontSize: 14, fontWeight: 800, cursor: "pointer", whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(45,212,191,0.3)" },
+  searchInput: { padding: "9px 14px", background: "var(--bg-3)", border: "1.5px solid var(--border-2)", borderRadius: 9, color: "var(--text-1)", fontSize: 14, outline: "none", width: 190 },
+  searchBtn: { padding: "9px 18px", background: "var(--accent-dim)", border: "1.5px solid rgba(45,212,191,0.25)", borderRadius: 9, color: "var(--accent)", fontSize: 13, fontWeight: 700, cursor: "pointer" },
+  emptyState: { textAlign: "center", padding: "72px 20px", background: "var(--bg-2)", borderRadius: 16, border: "1px dashed var(--border-2)" },
+  historyCard: { background: "var(--bg-2)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 22px", transition: "border-color 0.2s", animation: "fadeIn 0.3s ease" },
   historyTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
-  historyMeta: { display: "flex", gap: 20, marginTop: 14, flexWrap: "wrap", fontSize: 12, color: "#6b7280" },
+  historyMeta: { display: "flex", gap: 20, marginTop: 12, flexWrap: "wrap", fontSize: 12, color: "var(--text-3)" },
 };
