@@ -4,16 +4,35 @@ import { outingAPI } from "../utils/api";
 import { useToast } from "../components/Toast";
 
 const STATUS_COLORS = {
-  PENDING:  { bg: "rgba(240,165,0,0.08)", color: "#D4880F", border: "rgba(240,165,0,0.20)" },
-  APPROVED: { bg: "rgba(0,184,148,0.08)", color: "#00B894", border: "rgba(0,184,148,0.20)" },
-  OUT:      { bg: "rgba(108,92,231,0.08)", color: "#6C5CE7", border: "rgba(108,92,231,0.20)" },
-  OVERDUE:  { bg: "rgba(231,76,60,0.08)", color: "#E74C3C", border: "rgba(231,76,60,0.20)" },
-  RETURNED: { bg: "rgba(138,138,138,0.08)", color: "#8A8A8A", border: "rgba(138,138,138,0.20)" },
+  PENDING:  { bg: "rgba(232,163,23,0.10)", color: "#B8860B", border: "rgba(232,163,23,0.25)" },
+  APPROVED: { bg: "rgba(0,184,148,0.10)", color: "#00B894", border: "rgba(0,184,148,0.25)" },
+  OUT:      { bg: "rgba(108,92,231,0.10)", color: "#6C5CE7", border: "rgba(108,92,231,0.25)" },
+  OVERDUE:  { bg: "rgba(231,76,60,0.12)", color: "#E74C3C", border: "rgba(231,76,60,0.25)" },
+  RETURNED: { bg: "rgba(138,138,138,0.10)", color: "#8A8A8A", border: "rgba(138,138,138,0.20)" },
+};
+
+const AI_FLAG_CONFIG = {
+  MEDICAL_EMERGENCY: { color: "#fff", bg: "#E74C3C", icon: "\u26A0", label: "Medical Emergency" },
+  URGENT:            { color: "#fff", bg: "#F39C12", icon: "\u26A1", label: "Urgent" },
+  ROUTINE:           { color: "#fff", bg: "#00B894", icon: "\u2714", label: "Routine" },
+  SUSPICIOUS:        { color: "#fff", bg: "#6C5CE7", icon: "\u26A0", label: "Suspicious" },
 };
 
 function StatusBadge({ status }) {
   const c = STATUS_COLORS[status] || STATUS_COLORS.PENDING;
   return <span style={{ padding:"4px 12px",borderRadius:99,fontSize:11,fontWeight:700,background:c.bg,color:c.color,border:`1px solid ${c.border}` }}>{status}</span>;
+}
+
+function AiFlagBanner({ flag, score }) {
+  if (!flag) return null;
+  const cfg = AI_FLAG_CONFIG[flag] || { color: "#fff", bg: "#8A8A8A", icon: "\u2022", label: flag };
+  return (
+    <div style={{ display:"flex",alignItems:"center",gap:8,padding:"6px 12px",borderRadius:8,background:cfg.bg,color:cfg.color,fontSize:12,fontWeight:600 }}>
+      <span style={{fontSize:14}}>{cfg.icon}</span>
+      <span>{cfg.label}</span>
+      {score != null && <span style={{opacity:0.8,fontSize:11}}>Score: {score}</span>}
+    </div>
+  );
 }
 
 function formatDT(dt) {
@@ -76,10 +95,10 @@ export default function StudentPortal() {
       <style>{`
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes spin { to{transform:rotate(360deg)} }
-        ::placeholder { color:#999 !important; }
+        ::placeholder { color:#aaa !important; }
       `}</style>
 
-      {/* SIDEBAR — dark */}
+      {/* SIDEBAR */}
       <aside style={{width:260,background:"var(--sidebar-bg)",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"24px 16px",position:"sticky",top:0,height:"100vh",flexShrink:0}}>
         <div style={{display:"flex",flexDirection:"column",gap:24}}>
           <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 8px"}}>
@@ -93,7 +112,7 @@ export default function StudentPortal() {
           </div>
 
           <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",background:"rgba(255,255,255,0.05)",borderRadius:10,border:"1px solid rgba(255,255,255,0.08)"}}>
-            <div style={{width:34,height:34,borderRadius:"50%",background:"var(--accent)",color:"#fff",fontWeight:700,fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>{user?.name?.[0]?.toUpperCase()||"S"}</div>
+            <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#6C5CE7,#a29bfe)",color:"#fff",fontWeight:700,fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>{user?.name?.[0]?.toUpperCase()||"S"}</div>
             <div>
               <div style={{color:"#fff",fontWeight:600,fontSize:14}}>{user?.name}</div>
               <div style={{color:"var(--sidebar-text)",fontSize:12,marginTop:1,opacity:0.7}}>Student</div>
@@ -120,14 +139,17 @@ export default function StudentPortal() {
         </button>
       </aside>
 
-      {/* MAIN — light */}
+      {/* MAIN */}
       <main style={{flex:1,background:"var(--bg)",padding:"32px 40px",overflow:"auto"}}>
         {tab==="apply" && (
           <div style={{maxWidth:820,animation:"fadeIn 0.3s ease"}}>
-            <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:4}}>Apply for Outing</h1>
-            <p style={{color:"var(--text-3)",fontSize:14,marginBottom:28}}>Submit a new outing request. AI will analyse your request automatically.</p>
+            {/* Page header with tinted background */}
+            <div style={{background:"linear-gradient(135deg, rgba(108,92,231,0.06), rgba(162,155,254,0.04))",borderRadius:16,padding:"28px 28px 24px",marginBottom:24,border:"1px solid rgba(108,92,231,0.08)"}}>
+              <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:6}}>Apply for Outing</h1>
+              <p style={{color:"var(--text-3)",fontSize:14}}>Submit a new outing request. AI will analyse your request automatically.</p>
+            </div>
 
-            <form onSubmit={handleApply} style={{background:"#fff",border:"1px solid var(--border)",borderRadius:16,padding:28,boxShadow:"0 2px 8px rgba(0,0,0,0.04)"}}>
+            <form onSubmit={handleApply} style={{background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:16,padding:28,boxShadow:"0 2px 8px rgba(0,0,0,0.04)"}}>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18,marginBottom:22}}>
                 <FormField label="Student ID" name="studentId" value={form.studentId} onChange={handleChange} placeholder="Your student ID" />
                 <FormField label="Full Name" name="studentName" value={form.studentName} onChange={handleChange} placeholder="Your full name" />
@@ -135,19 +157,26 @@ export default function StudentPortal() {
                 <FormField label="Destination" name="destination" value={form.destination} onChange={handleChange} placeholder="Where are you going?" span={2} />
                 <div style={{gridColumn:"1/-1"}}>
                   <label style={labelStyle}>Reason for Outing</label>
-                  <textarea name="reason" value={form.reason} onChange={handleChange} placeholder="Describe why you need to go out..." rows={3}
-                    style={{width:"100%",padding:"12px 14px",resize:"vertical",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-1)",fontSize:14,outline:"none"}} />
+                  <textarea name="reason" value={form.reason} onChange={handleChange} placeholder="Describe why you need to go out in detail... (AI will analyse urgency)" rows={3}
+                    style={{width:"100%",padding:"12px 14px",resize:"vertical",background:"var(--bg)",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-1)",fontSize:14,outline:"none"}} />
                 </div>
                 <FormField label="Out Date & Time" name="outDate" value={form.outDate} onChange={handleChange} type="datetime-local" min={minDT} />
                 <FormField label="Return Date & Time" name="returnDate" value={form.returnDate} onChange={handleChange} type="datetime-local" min={minDT} />
               </div>
 
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:14,flexWrap:"wrap"}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 14px",background:"var(--accent-dim)",borderRadius:10,flex:1}}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                  <span style={{fontSize:13,color:"var(--text-2)"}}>Your request will be <strong style={{color:"var(--accent)"}}>AI-analysed</strong> for urgency.</span>
+              {/* AI Analysis info banner */}
+              <div style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",background:"linear-gradient(135deg, rgba(108,92,231,0.06), rgba(0,184,148,0.04))",borderRadius:12,marginBottom:20,border:"1px solid rgba(108,92,231,0.10)"}}>
+                <div style={{width:36,height:36,borderRadius:10,background:"var(--accent)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 </div>
-                <button type="submit" disabled={submitting} style={{padding:"13px 28px",background:"var(--accent)",border:"none",borderRadius:10,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 14px rgba(108,92,231,0.3)",opacity:submitting?0.7:1,whiteSpace:"nowrap"}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:600,color:"var(--text-1)"}}>AI-Powered Urgency Analysis</div>
+                  <div style={{fontSize:12,color:"var(--text-3)",marginTop:2}}>Your request will be categorised as <strong style={{color:"#E74C3C"}}>Emergency</strong>, <strong style={{color:"#F39C12"}}>Urgent</strong>, <strong style={{color:"#00B894"}}>Routine</strong>, or <strong style={{color:"#6C5CE7"}}>Suspicious</strong></div>
+                </div>
+              </div>
+
+              <div style={{display:"flex",justifyContent:"flex-end"}}>
+                <button type="submit" disabled={submitting} style={{padding:"13px 32px",background:"var(--accent)",border:"none",borderRadius:10,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 14px rgba(108,92,231,0.3)",opacity:submitting?0.7:1}}>
                   {submitting?"Submitting...":"Submit Request"}
                 </button>
               </div>
@@ -163,8 +192,10 @@ export default function StudentPortal() {
                 <p style={{color:"var(--text-3)",fontSize:14,marginTop:4}}>{history.length} total request(s)</p>
               </div>
               <div style={{display:"flex",gap:10,alignItems:"center"}}>
-                <input value={form.studentId} onChange={(e)=>setForm(p=>({...p,studentId:e.target.value}))} placeholder="Student ID..." style={{padding:"9px 14px",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:8,color:"var(--text-1)",fontSize:13,outline:"none",width:170}} />
-                <button onClick={()=>loadHistory()} disabled={historyLoading} style={{padding:"9px 18px",background:"var(--accent)",border:"none",borderRadius:8,color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer"}}>{historyLoading?"...":"Search"}</button>
+                <input value={form.studentId} onChange={(e)=>setForm(p=>({...p,studentId:e.target.value}))} placeholder="Student ID..."
+                  style={{padding:"9px 14px",background:"var(--bg-2)",border:"1.5px solid var(--border-2)",borderRadius:8,color:"var(--text-1)",fontSize:13,outline:"none",width:170}} />
+                <button onClick={()=>loadHistory()} disabled={historyLoading}
+                  style={{padding:"9px 18px",background:"var(--accent)",border:"none",borderRadius:8,color:"#fff",fontSize:13,fontWeight:600,cursor:"pointer"}}>{historyLoading?"...":"Search"}</button>
               </div>
             </div>
 
@@ -176,39 +207,46 @@ export default function StudentPortal() {
             )}
 
             {!historyLoading && history.length===0 && (
-              <div style={{textAlign:"center",padding:"60px 20px",background:"#fff",borderRadius:16,border:"1px dashed var(--border-2)"}}>
+              <div style={{textAlign:"center",padding:"60px 20px",background:"var(--bg-2)",borderRadius:16,border:"1px dashed var(--border-2)"}}>
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" strokeWidth="1.5" style={{marginBottom:12}}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <div style={{color:"var(--text-1)",fontWeight:600,fontSize:15}}>No requests found</div>
                 <div style={{color:"var(--text-3)",fontSize:13,marginTop:4}}>Apply for your first outing or check your Student ID.</div>
               </div>
             )}
 
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {history.map(o=>(
-                <div key={o.id} style={{background:"#fff",border:"1px solid var(--border)",borderRadius:12,padding:"18px 22px",boxShadow:"0 1px 3px rgba(0,0,0,0.04)",animation:"fadeIn 0.3s ease"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-                    <div>
-                      <div style={{color:"var(--text-1)",fontWeight:600,fontSize:15}}>#{o.id} — {o.destination}</div>
-                      <div style={{color:"var(--text-3)",fontSize:13,marginTop:4}}>{o.reason}</div>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {history.map(o=>{
+                const flagCfg = AI_FLAG_CONFIG[o.aiFlag];
+                const cardBorder = o.status==="OVERDUE" ? "rgba(231,76,60,0.20)" : o.status==="APPROVED" ? "rgba(0,184,148,0.15)" : "var(--border)";
+                const cardTint = o.status==="OVERDUE" ? "rgba(231,76,60,0.02)" : o.status==="APPROVED" ? "rgba(0,184,148,0.02)" : "var(--bg-2)";
+                return (
+                <div key={o.id} style={{background:cardTint,border:`1.5px solid ${cardBorder}`,borderRadius:14,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.04)",animation:"fadeIn 0.3s ease"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
+                    <div style={{flex:1}}>
+                      <div style={{color:"var(--text-1)",fontWeight:700,fontSize:15}}>#{o.id} \u2014 {o.destination}</div>
+                      <div style={{color:"var(--text-3)",fontSize:13,marginTop:4,lineHeight:1.5}}>{o.reason}</div>
                     </div>
-                    <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}}>
+                    <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8,flexShrink:0}}>
                       <StatusBadge status={o.status} />
-                      {o.aiFlag && <span style={{fontSize:11,color:"var(--text-3)",fontWeight:500}}>{o.aiFlag} (Score: {o.urgencyScore})</span>}
+                      <AiFlagBanner flag={o.aiFlag} score={o.urgencyScore} />
                     </div>
                   </div>
-                  <div style={{display:"flex",gap:20,marginTop:12,fontSize:12,color:"var(--text-3)"}}>
+                  <div style={{display:"flex",gap:20,marginTop:14,fontSize:12,color:"var(--text-3)",padding:"10px 14px",background:"var(--bg)",borderRadius:8}}>
                     <span>Out: {formatDT(o.outDate)}</span>
                     <span>Return: {formatDT(o.returnDate)}</span>
-                    {o.wardenComment && <span>&quot;{o.wardenComment}&quot;</span>}
+                    {o.wardenComment && <span style={{color:"var(--text-2)",fontStyle:"italic"}}>&quot;{o.wardenComment}&quot;</span>}
                   </div>
                   {o.qrCodeUrl && o.status==="APPROVED" && (
-                    <div style={{marginTop:14,padding:14,background:"rgba(0,184,148,0.06)",borderRadius:10,border:"1px solid rgba(0,184,148,0.15)"}}>
-                      <div style={{color:"var(--green)",fontSize:12,fontWeight:700,marginBottom:10}}>Approved — Show this QR to the guard</div>
-                      <img src={o.qrCodeUrl} alt="QR Code" style={{width:110,height:110,borderRadius:8,background:"white",padding:4}} />
+                    <div style={{marginTop:14,padding:16,background:"rgba(0,184,148,0.05)",borderRadius:12,border:"1px solid rgba(0,184,148,0.15)",display:"flex",alignItems:"center",gap:16}}>
+                      <img src={o.qrCodeUrl} alt="QR Code" style={{width:90,height:90,borderRadius:8,background:"white",padding:4}} />
+                      <div>
+                        <div style={{color:"var(--green)",fontSize:14,fontWeight:700,marginBottom:4}}>Approved \u2014 Show QR at gate</div>
+                        <div style={{color:"var(--text-3)",fontSize:12}}>Outing ID: #{o.id}</div>
+                      </div>
                     </div>
                   )}
                 </div>
-              ))}
+              );})}
             </div>
           </div>
         )}
@@ -224,7 +262,7 @@ function FormField({ label, name, value, onChange, type="text", placeholder, spa
     <div style={{gridColumn:span===2?"1/-1":undefined}}>
       <label style={labelStyle}>{label}</label>
       <input name={name} value={value} onChange={onChange} type={type} placeholder={placeholder} min={min}
-        style={{width:"100%",padding:"12px 14px",background:"#fff",border:"1.5px solid rgba(0,0,0,0.10)",borderRadius:10,color:"#1A1A1A",fontSize:14,outline:"none"}} />
+        style={{width:"100%",padding:"12px 14px",background:"var(--bg)",border:"1.5px solid var(--border-2)",borderRadius:10,color:"#1A1A1A",fontSize:14,outline:"none"}} />
     </div>
   );
 }

@@ -12,14 +12,14 @@ const STATUS_MAP = {
 };
 
 const AI_FLAGS = {
-  MEDICAL_EMERGENCY:{color:"#E74C3C",bg:"rgba(231,76,60,0.06)"},
-  URGENT:{color:"#F39C12",bg:"rgba(243,156,18,0.06)"},
-  ROUTINE:{color:"#00B894",bg:"rgba(0,184,148,0.06)"},
-  SUSPICIOUS:{color:"#6C5CE7",bg:"rgba(108,92,231,0.06)"},
+  MEDICAL_EMERGENCY:{color:"#fff",bg:"#E74C3C",icon:"\u26A0",label:"EMERGENCY"},
+  URGENT:{color:"#fff",bg:"#F39C12",icon:"\u26A1",label:"URGENT"},
+  ROUTINE:{color:"#fff",bg:"#00B894",icon:"\u2714",label:"ROUTINE"},
+  SUSPICIOUS:{color:"#fff",bg:"#6C5CE7",icon:"\u26A0",label:"SUSPICIOUS"},
 };
 
 function Badge({status}) { const s=STATUS_MAP[status]||STATUS_MAP.PENDING; return <span style={{padding:"3px 10px",borderRadius:99,fontSize:10,fontWeight:700,background:s.bg,color:s.color,border:`1px solid ${s.border}`}}>{status}</span>; }
-function AiChip({flag,score}) { if(!flag)return null; const i=AI_FLAGS[flag]||{color:"#8A8A8A",bg:"rgba(138,138,138,0.06)"}; return <span style={{padding:"3px 10px",borderRadius:99,fontSize:10,fontWeight:600,background:i.bg,color:i.color}}>{flag} &middot; {score}</span>; }
+function AiChip({flag,score}) { if(!flag)return null; const i=AI_FLAGS[flag]||{color:"#fff",bg:"#8A8A8A",icon:"\u2022",label:flag}; return <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:8,fontSize:10,fontWeight:700,background:i.bg,color:i.color,letterSpacing:"0.3px"}}>{i.icon} {i.label} &middot; {score}</span>; }
 function formatDT(dt) { if(!dt)return"\u2014"; return new Date(dt).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}); }
 
 export default function WardenDashboard() {
@@ -94,18 +94,20 @@ export default function WardenDashboard() {
 
       {/* MAIN */}
       <main style={{flex:1,background:"var(--bg)",padding:"28px 36px",overflow:"auto"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,flexWrap:"wrap",gap:14}}>
-          <div>
-            <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)"}}>Outing Requests</h1>
-            <p style={{color:"var(--text-3)",fontSize:13,marginTop:4}}>{stats.pending} pending &bull; {stats.overdue} overdue</p>
+        <div style={{background:"linear-gradient(135deg, rgba(0,184,148,0.05), rgba(108,92,231,0.04))",borderRadius:16,padding:"24px 24px 20px",marginBottom:20,border:"1px solid rgba(0,184,148,0.08)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:14}}>
+            <div>
+              <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)"}}>Outing Requests</h1>
+              <p style={{color:"var(--text-3)",fontSize:13,marginTop:4}}>{stats.pending} pending &bull; {stats.overdue} overdue</p>
+            </div>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name, ID..." style={{padding:"9px 14px",background:"var(--bg-2)",border:"1.5px solid var(--border-2)",borderRadius:8,color:"var(--text-1)",fontSize:13,outline:"none",width:220}} />
           </div>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name, ID..." style={{padding:"9px 14px",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:8,color:"var(--text-1)",fontSize:13,outline:"none",width:220}} />
         </div>
 
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:18}}>
           {FILTERS.map(f=>{
             const cnt=f==="ALL"?outings.length:outings.filter(o=>o.status===f).length;
-            return <button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:99,border:filter===f?"1.5px solid var(--accent)":"1px solid var(--border-2)",background:filter===f?"var(--accent-dim)":"#fff",color:filter===f?"var(--accent)":"var(--text-3)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>{f} {cnt>0&&<span style={{opacity:0.6,fontSize:10}}>({cnt})</span>}</button>;
+            return <button key={f} onClick={()=>setFilter(f)} style={{padding:"6px 14px",borderRadius:99,border:filter===f?"1.5px solid var(--accent)":"1px solid var(--border-2)",background:filter===f?"var(--accent-dim)":"var(--bg-2)",color:filter===f?"var(--accent)":"var(--text-3)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>{f} {cnt>0&&<span style={{opacity:0.6,fontSize:10}}>({cnt})</span>}</button>;
           })}
         </div>
 
@@ -115,13 +117,13 @@ export default function WardenDashboard() {
             <p style={{color:"var(--text-3)",marginTop:14}}>Loading...</p>
           </div>
         ):filtered.length===0?(
-          <div style={{textAlign:"center",padding:"60px 20px",background:"#fff",borderRadius:16,border:"1px dashed var(--border-2)"}}>
+          <div style={{textAlign:"center",padding:"60px 20px",background:"var(--bg-2)",borderRadius:16,border:"1px dashed var(--border-2)"}}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" strokeWidth="1.5" style={{marginBottom:12}}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <div style={{color:"var(--text-1)",fontWeight:600}}>No requests found</div>
             <div style={{color:"var(--text-3)",fontSize:13,marginTop:4}}>Try adjusting your filter or search</div>
           </div>
         ):(
-          <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+          <div style={{background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:14,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
             <div style={{display:"grid",gridTemplateColumns:"50px 130px 1fr 130px 150px 100px 100px",gap:14,padding:"12px 20px",background:"var(--bg-3)",borderBottom:"1px solid var(--border)"}}>
               {["ID","Student","Destination & Reason","AI Analysis","Dates","Status","Actions"].map(h=><div key={h} style={{fontSize:10,fontWeight:700,color:"var(--text-3)",textTransform:"uppercase",letterSpacing:"0.5px"}}>{h}</div>)}
             </div>
@@ -156,7 +158,7 @@ export default function WardenDashboard() {
 
         {/* Approve panel */}
         {selected&&selected.status==="PENDING"&&(
-          <div style={{marginTop:18,background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:24,boxShadow:"0 8px 30px rgba(0,0,0,0.08)",animation:"fadeIn 0.2s ease"}}>
+          <div style={{marginTop:18,background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:14,padding:24,boxShadow:"0 8px 30px rgba(0,0,0,0.08)",animation:"fadeIn 0.2s ease"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
               <div>
                 <h3 style={{color:"var(--text-1)",fontWeight:700,fontSize:16}}>Approve Request #{selected.id}</h3>
@@ -167,20 +169,20 @@ export default function WardenDashboard() {
             <div style={{marginTop:14}}>
               <label style={{fontSize:14,fontWeight:600,color:"var(--text-1)"}}>Approval Comment</label>
               <textarea value={comment} onChange={e=>setComment(e.target.value)} placeholder="Add your comment..." rows={3}
-                style={{width:"100%",padding:"12px 14px",marginTop:6,resize:"vertical",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-1)",fontSize:14,outline:"none"}} />
+                style={{width:"100%",padding:"12px 14px",marginTop:6,resize:"vertical",background:"var(--bg-2)",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-1)",fontSize:14,outline:"none"}} />
             </div>
             <div style={{display:"flex",gap:10,marginTop:14}}>
               <button onClick={()=>handleApprove(selected.id)} disabled={approving===selected.id} style={{padding:"11px 22px",background:"var(--green)",border:"none",borderRadius:10,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,184,148,0.25)",opacity:approving===selected.id?0.7:1}}>
                 {approving===selected.id?"Approving...":"Confirm Approval & Generate QR"}
               </button>
-              <button onClick={()=>setSelected(null)} style={{padding:"11px 18px",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-2)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancel</button>
+              <button onClick={()=>setSelected(null)} style={{padding:"11px 18px",background:"var(--bg-2)",border:"1.5px solid var(--border-2)",borderRadius:10,color:"var(--text-2)",fontSize:13,fontWeight:600,cursor:"pointer"}}>Cancel</button>
             </div>
           </div>
         )}
 
         {/* QR view */}
         {selected&&selected.qrCodeUrl&&selected.status!=="PENDING"&&(
-          <div style={{marginTop:18,background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:24,boxShadow:"0 8px 30px rgba(0,0,0,0.08)",animation:"fadeIn 0.2s ease"}}>
+          <div style={{marginTop:18,background:"var(--bg-2)",border:"1px solid var(--border)",borderRadius:14,padding:24,boxShadow:"0 8px 30px rgba(0,0,0,0.08)",animation:"fadeIn 0.2s ease"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
               <div>
                 <h3 style={{color:"var(--green)",fontWeight:700,fontSize:16}}>QR Code — #{selected.id}</h3>
