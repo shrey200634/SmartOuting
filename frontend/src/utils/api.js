@@ -46,6 +46,18 @@ export const authAPI = {
       body: JSON.stringify(data),
     }),
 
+  verifyOtp: (email, otp) =>
+    request("/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify({ email, otp }),
+    }),
+
+  resendOtp: (email) =>
+    request("/auth/resend-otp", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
   // Backend uses name (not email) to look up user: findByName(username)
   login: (username, password) =>
     request("/auth/token", {

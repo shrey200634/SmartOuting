@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
+import { authAPI } from "../utils/api";
 
 const ROLES = [
   { value:"STUDENT", label:"Student",    desc:"Apply for campus outings & track requests",  gradient:"linear-gradient(135deg, #2DD4BF, #5EEAD4)", iconBg:"rgba(45,212,191,0.1)" },
@@ -21,12 +22,25 @@ export default function Register({ onSwitchToLogin }) {
   const { register } = useAuth();
   const { toast }    = useToast();
 
-  const [step, setStep]             = useState(1);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [form, setForm]             = useState({ name:"", email:"", password:"", confirmPassword:"" });
-  const [loading, setLoading]       = useState(false);
-  const [focused, setFocused]       = useState("");
-  const [showPass, setShowPass]     = useState(false);
+  const [step, setStep]                   = useState(1);
+  const [selectedRole, setSelectedRole]   = useState(null);
+  const [form, setForm]                   = useState({ name:"", email:"", password:"", confirmPassword:"" });
+  const [loading, setLoading]             = useState(false);
+  const [focused, setFocused]             = useState("");
+  const [showPass, setShowPass]           = useState(false);
+
+  // OTP state
+  const [otpValues, setOtpValues]         = useState(["","","","","",""]);
+  const [otpLoading, setOtpLoading]       = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const otpRefs = useRef([]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleChange = (e) => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -43,8 +57,9 @@ export default function Register({ onSwitchToLogin }) {
     setLoading(true);
     try {
       await register({ name:form.name.trim(), email:form.email.trim().toLowerCase(), password:form.password, role:selectedRole.value });
-      toast("Account created! Sign in with your full name.", "success");
-      setTimeout(() => onSwitchToLogin(), 1200);
+      toast("OTP sent to " + form.email.trim().toLowerCase() + "! Check your inbox.", "success");
+      setResendCooldown(60);
+      setStep(3); // Go to OTP step
     } catch (err) {
       const m = err.message || "";
       if (m.toLowerCase().includes("exist") || m.toLowerCase().includes("duplicate") || m.includes("1062"))
@@ -53,6 +68,71 @@ export default function Register({ onSwitchToLogin }) {
         toast("Cannot connect to server. Please try again.", "error");
       else toast(m || "Registration failed.", "error");
     } finally { setLoading(false); }
+  };
+
+  // OTP input handlers
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    if (value && !/^\d$/.test(value)) return;
+
+    const newOtp = [...otpValues];
+    newOtp[index] = value;
+    setOtpValues(newOtp);
+
+    // Auto-focus next
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+    if (e.key === "Enter") {
+      handleVerifyOtp();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    const newOtp = [...otpValues];
+    for (let i = 0; i < 6; i++) {
+      newOtp[i] = pasted[i] || "";
+    }
+    setOtpValues(newOtp);
+    const focusIdx = Math.min(pasted.length, 5);
+    otpRefs.current[focusIdx]?.focus();
+  };
+
+  const handleVerifyOtp = async () => {
+    const otp = otpValues.join("");
+    if (otp.length !== 6) return toast("Please enter the complete 6-digit code", "warn");
+    setOtpLoading(true);
+    try {
+      await authAPI.verifyOtp(form.email.trim().toLowerCase(), otp);
+      toast("Email verified! You can now sign in.", "success");
+      setTimeout(() => onSwitchToLogin(), 1500);
+    } catch (err) {
+      toast(err.message || "Invalid or expired OTP. Please try again.", "error");
+      setOtpValues(["","","","","",""]);
+      otpRefs.current[0]?.focus();
+    } finally { setOtpLoading(false); }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      await authAPI.resendOtp(form.email.trim().toLowerCase());
+      toast("New OTP sent to your email!", "success");
+      setResendCooldown(60);
+      setOtpValues(["","","","","",""]);
+      otpRefs.current[0]?.focus();
+    } catch (err) {
+      toast(err.message || "Failed to resend OTP.", "error");
+    }
   };
 
   const pwStrength = () => { const l=form.password.length; if(!l)return 0; if(l<4)return 1; if(l<6)return 2; if(l<10)return 3; return 4; };
@@ -66,12 +146,22 @@ export default function Register({ onSwitchToLogin }) {
     borderRadius:12, color:"var(--text-1)", fontSize:14, outline:"none", transition:"all 0.2s",
   });
 
+  const maskedEmail = () => {
+    const e = form.email.trim().toLowerCase();
+    const [local, domain] = e.split("@");
+    if (!domain) return e;
+    const visible = local.slice(0, 2);
+    return visible + "***@" + domain;
+  };
+
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Inter',sans-serif",padding:20}}>
       <style>{`
         ::placeholder { color:var(--text-4) !important; }
         @keyframes cardIn { from{opacity:0;transform:translateY(20px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
         @keyframes spin { to{transform:rotate(360deg)} }
+        @keyframes fadeSlideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulseRing { 0%{box-shadow:0 0 0 0 rgba(45,212,191,0.4)} 70%{box-shadow:0 0 0 12px rgba(45,212,191,0)} 100%{box-shadow:0 0 0 0 rgba(45,212,191,0)} }
       `}</style>
 
       <div style={{position:"relative",background:"#fff",border:"1px solid var(--border)",borderRadius:20,padding:"40px 40px",width:"100%",maxWidth:480,boxShadow:"0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04)",animation:"cardIn 0.5s ease"}}>
@@ -91,22 +181,23 @@ export default function Register({ onSwitchToLogin }) {
         </div>
 
         {/* Step indicator */}
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:28}}>
-          {[{n:1,label:"Choose Role"},{n:2,label:"Your Details"}].map(({n,label},i) => (
-            <div key={n} style={{display:"flex",alignItems:"center",gap:8}}>
-              <div style={{width:28,height:28,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,transition:"all 0.3s",
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:28}}>
+          {[{n:1,label:"Role"},{n:2,label:"Details"},{n:3,label:"Verify"}].map(({n,label},i) => (
+            <div key={n} style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,transition:"all 0.3s",
                 background:step>=n?"var(--accent)":"var(--bg-3)",
                 color:step>=n?"#fff":"var(--text-4)",
+                ...(step===n ? {animation:"pulseRing 2s infinite"} : {}),
               }}>
-                {step>n ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg> : n}
+                {step>n ? <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg> : n}
               </div>
-              <span style={{fontSize:13,fontWeight:step>=n?600:400,color:step>=n?"var(--text-1)":"var(--text-4)"}}>{label}</span>
-              {i<1 && <div style={{width:32,height:2,background:step>n?"var(--accent)":"var(--bg-4)",margin:"0 4px",borderRadius:2,transition:"background 0.3s"}}/>}
+              <span style={{fontSize:12,fontWeight:step>=n?600:400,color:step>=n?"var(--text-1)":"var(--text-4)"}}>{label}</span>
+              {i<2 && <div style={{width:24,height:2,background:step>n?"var(--accent)":"var(--bg-4)",margin:"0 2px",borderRadius:2,transition:"background 0.3s"}}/>}
             </div>
           ))}
         </div>
 
-        {/* STEP 1 */}
+        {/* ════════════ STEP 1: ROLE ════════════ */}
         {step === 1 && (
           <>
             <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:6}}>Who are you?</h1>
@@ -116,14 +207,17 @@ export default function Register({ onSwitchToLogin }) {
               {ROLES.map(r => {
                 const isSelected = selectedRole?.value===r.value;
                 return (
-                  <button key={r.value} onClick={() => setSelectedRole(r)}
-                    style={{display:"flex",alignItems:"center",gap:14,padding:"16px 18px",border:`2px solid ${isSelected?"var(--accent)":"var(--border)"}`,borderRadius:14,cursor:"pointer",textAlign:"left",background:isSelected?"var(--accent-dim)":"#fff",transition:"all 0.2s",width:"100%",fontFamily:"'Inter',sans-serif",boxShadow:isSelected?"0 0 0 4px rgba(45,212,191,0.06)":"0 1px 3px rgba(0,0,0,0.04)"}}>
-                    <div style={{width:42,height:42,borderRadius:12,background:r.gradient,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",flexShrink:0}}>
-                      <RoleIcon role={r.value} size={20} />
+                  <button key={r.value} onClick={()=>setSelectedRole(r)}
+                    style={{display:"flex",alignItems:"center",gap:14,padding:"16px 18px",borderRadius:14,cursor:"pointer",transition:"all 0.2s",textAlign:"left",width:"100%",fontFamily:"'Inter',sans-serif",
+                      background:isSelected?r.iconBg:"#fff",
+                      border:`1.5px solid ${isSelected?"var(--accent)":"var(--border-2)"}`,
+                      boxShadow:isSelected?"0 0 0 4px rgba(45,212,191,0.08)":"0 1px 3px rgba(0,0,0,0.04)"}}>
+                    <div style={{width:40,height:40,borderRadius:10,background:isSelected?r.gradient:"var(--bg-3)",display:"flex",alignItems:"center",justifyContent:"center",color:isSelected?"#fff":"var(--text-3)",transition:"all 0.3s",flexShrink:0}}>
+                      <RoleIcon role={r.value} size={18}/>
                     </div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:15,fontWeight:700,color:"var(--text-1)",marginBottom:3}}>{r.label}</div>
-                      <div style={{fontSize:12,color:"var(--text-3)",lineHeight:1.4}}>{r.desc}</div>
+                      <div style={{fontSize:15,fontWeight:700,color:"var(--text-1)"}}>{r.label}</div>
+                      <div style={{fontSize:12,color:"var(--text-3)",marginTop:2}}>{r.desc}</div>
                     </div>
                     {isSelected && (
                       <div style={{width:22,height:22,borderRadius:"50%",background:"var(--accent)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
@@ -153,7 +247,7 @@ export default function Register({ onSwitchToLogin }) {
           </>
         )}
 
-        {/* STEP 2 */}
+        {/* ════════════ STEP 2: DETAILS ════════════ */}
         {step === 2 && (
           <>
             <button onClick={() => setStep(1)}
@@ -191,6 +285,7 @@ export default function Register({ onSwitchToLogin }) {
                   </span>
                   <input name="email" type="email" value={form.email} onChange={handleChange} onFocus={()=>setFocused("email")} onBlur={()=>setFocused("")} placeholder="john@example.com" style={inputStyle("email")}/>
                 </div>
+                <p style={{fontSize:12,color:"var(--text-3)",marginTop:5}}>OTP will be sent to this email for verification</p>
               </div>
 
               <div>
@@ -230,7 +325,7 @@ export default function Register({ onSwitchToLogin }) {
               <div style={{display:"flex",gap:10,marginTop:4}}>
                 <button onClick={()=>setStep(1)} style={{padding:"13px 20px",background:"#fff",border:"1.5px solid var(--border-2)",borderRadius:12,color:"var(--text-2)",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>Back</button>
                 <button onClick={handleSubmit} disabled={loading} style={{flex:1,padding:"13px",background:"var(--accent)",border:"none",borderRadius:12,color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 14px rgba(45,212,191,0.3)",opacity:loading?0.7:1,fontFamily:"'Inter',sans-serif"}}>
-                  {loading ? "Creating..." : "Create Account"}
+                  {loading ? "Sending OTP..." : "Send Verification Code"}
                 </button>
               </div>
             </div>
@@ -240,6 +335,93 @@ export default function Register({ onSwitchToLogin }) {
               <button onClick={onSwitchToLogin} style={{background:"none",border:"none",color:"var(--accent)",fontSize:14,fontWeight:700,cursor:"pointer"}}>Sign in</button>
             </div>
           </>
+        )}
+
+        {/* ════════════ STEP 3: OTP VERIFICATION ════════════ */}
+        {step === 3 && (
+          <div style={{animation:"fadeSlideIn 0.4s ease"}}>
+            {/* Email icon */}
+            <div style={{display:"flex",justifyContent:"center",marginBottom:24}}>
+              <div style={{width:72,height:72,borderRadius:20,background:"linear-gradient(135deg, rgba(45,212,191,0.1), rgba(45,212,191,0.05))",display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(45,212,191,0.2)"}}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+            </div>
+
+            <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",textAlign:"center",marginBottom:6}}>Verify your email</h1>
+            <p style={{fontSize:14,color:"var(--text-3)",textAlign:"center",marginBottom:8,lineHeight:1.5}}>
+              We sent a 6-digit code to
+            </p>
+            <p style={{fontSize:15,fontWeight:700,color:"var(--accent)",textAlign:"center",marginBottom:28}}>
+              {maskedEmail()}
+            </p>
+
+            {/* OTP Input Boxes */}
+            <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:28}} onPaste={handleOtpPaste}>
+              {otpValues.map((val, idx) => (
+                <input
+                  key={idx}
+                  ref={el => otpRefs.current[idx] = el}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={val}
+                  onChange={e => handleOtpChange(idx, e.target.value)}
+                  onKeyDown={e => handleOtpKeyDown(idx, e)}
+                  onFocus={e => e.target.select()}
+                  style={{
+                    width:50, height:56, textAlign:"center", fontSize:22, fontWeight:700,
+                    borderRadius:12, outline:"none", transition:"all 0.2s",
+                    color:"var(--text-1)", fontFamily:"'Inter',monospace",
+                    background: val ? "rgba(45,212,191,0.05)" : "#fff",
+                    border: `2px solid ${val ? "var(--accent)" : "var(--border-2)"}`,
+                    boxShadow: val ? "0 0 0 4px rgba(45,212,191,0.08)" : "0 1px 3px rgba(0,0,0,0.04)",
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Verify Button */}
+            <button onClick={handleVerifyOtp} disabled={otpLoading || otpValues.join("").length !== 6}
+              style={{
+                width:"100%",padding:"14px",border:"none",borderRadius:12,fontSize:15,fontWeight:700,
+                cursor: otpValues.join("").length === 6 ? "pointer" : "default",
+                fontFamily:"'Inter',sans-serif",transition:"all 0.2s",
+                background: otpValues.join("").length === 6 ? "var(--accent)" : "var(--bg-4)",
+                color: otpValues.join("").length === 6 ? "#fff" : "var(--text-4)",
+                boxShadow: otpValues.join("").length === 6 ? "0 4px 14px rgba(45,212,191,0.3)" : "none",
+                opacity: otpLoading ? 0.7 : 1,
+              }}>
+              {otpLoading ? (
+                <span style={{display:"inline-flex",alignItems:"center",gap:8}}>
+                  <span style={{width:16,height:16,border:"2px solid rgba(255,255,255,0.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin 0.6s linear infinite",display:"inline-block"}}/>
+                  Verifying...
+                </span>
+              ) : "Verify & Create Account"}
+            </button>
+
+            {/* Resend */}
+            <div style={{textAlign:"center",marginTop:20}}>
+              <span style={{fontSize:14,color:"var(--text-3)"}}>Didn't receive the code? </span>
+              {resendCooldown > 0 ? (
+                <span style={{fontSize:14,color:"var(--text-4)"}}>Resend in {resendCooldown}s</span>
+              ) : (
+                <button onClick={handleResendOtp} style={{background:"none",border:"none",color:"var(--accent)",fontSize:14,fontWeight:700,cursor:"pointer"}}>
+                  Resend Code
+                </button>
+              )}
+            </div>
+
+            {/* Change email */}
+            <div style={{textAlign:"center",marginTop:12}}>
+              <button onClick={() => { setStep(2); setOtpValues(["","","","","",""]); }}
+                style={{background:"none",border:"none",color:"var(--text-3)",fontSize:13,cursor:"pointer",textDecoration:"underline"}}>
+                Change email address
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -49,7 +49,8 @@ public class AuthConfig {
                 .authorizeHttpRequests(auth -> auth
                         // CRITICAL: permit ALL OPTIONS preflight requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/register", "/auth/token", "/auth/validate").permitAll()
+                        .requestMatchers("/auth/register", "/auth/token", "/auth/validate",
+                                "/auth/verify-otp", "/auth/resend-otp").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
