@@ -6,25 +6,6 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOriginPatterns:
-              - "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-              - PATCH
-            allowedHeaders:
-              - "*"
-            exposedHeaders:
-              - Authorization
-            allowCredentials: true
-            maxAge: 3600
-
       discovery:
         locator:
           enabled: true
@@ -35,15 +16,11 @@ spring:
           uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=/auth/**
-          filters:
-            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
         - id: outing-service
           uri: lb://OUTING-SERVICE
           predicates:
             - Path=/outing/**
-          filters:
-            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
 eureka:
   instance:
