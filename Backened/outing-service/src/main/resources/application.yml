@@ -25,6 +25,10 @@ spring:
           starttls:
             enable: true
 
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}
+
 eureka:
   instance:
     prefer-ip-address: true
