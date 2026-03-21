@@ -38,13 +38,15 @@ export function AuthProvider({ children }) {
 
     // Decode role directly from JWT payload — no localStorage role-map needed
     let role = null;
+    let email = null;
     try {
       const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
       const claims = JSON.parse(atob(base64));
       role = claims?.role || null;
+      email = claims?.email || null;
     } catch (_) {}
 
-    const userData = { token, name: username.trim(), role };
+    const userData = { token, name: username.trim(), role, email };
     localStorage.setItem("sos_token", token);
     localStorage.setItem("sos_user", JSON.stringify(userData));
     setUser(userData);

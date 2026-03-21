@@ -35,6 +35,7 @@ public class OutingService {
         Outing outing = new Outing();
         outing.setStudentId(request.getStudentId());
         outing.setStudentName(request.getStudentName());
+        outing.setStudentEmail(request.getStudentEmail());
         outing.setParentEmail(request.getParentEmail());
         outing.setReason(request.getReason());
         outing.setDestination(request.getDestination());
@@ -54,7 +55,14 @@ public class OutingService {
         outing.setStatus("APPROVED");
         outing.setWardenComment(comment);
         outing.setQrCodeUrl(QrCodeUtil.generateQR("ID:" + outing.getId() + "-STATUS:APPROVED-" + outing.getStudentId(), 200, 200));
-        return mapToResponse(outingRepository.save(outing));
+        Outing saved = outingRepository.save(outing);
+
+        // Send approval email with QR code to student's registered email
+        if (saved.getStudentEmail() != null && !saved.getStudentEmail().isBlank()) {
+            emailService.sendApprovalEmailWithQR(saved);
+        }
+
+        return mapToResponse(saved);
     }
 
     // Guard scans student OUT (leaving campus)
@@ -83,8 +91,8 @@ public class OutingService {
 
     private OutingResponseDTO mapToResponse(Outing outing) {
         return new OutingResponseDTO(outing.getId(), outing.getStudentId(), outing.getStudentName(),
-                outing.getReason(), outing.getDestination(), outing.getStatus(), outing.getAiFlag(),
-                outing.getUrgencyScore(), outing.getWardenComment(), outing.getQrCodeUrl(),
+                outing.getStudentEmail(), outing.getReason(), outing.getDestination(), outing.getStatus(),
+                outing.getAiFlag(), outing.getUrgencyScore(), outing.getWardenComment(), outing.getQrCodeUrl(),
                 outing.getOutDate(), outing.getReturnDate());
     }
 

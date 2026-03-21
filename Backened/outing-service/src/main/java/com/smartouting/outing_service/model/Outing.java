@@ -18,6 +18,9 @@ public class Outing {
     private String studentId;
     private String studentName;
 
+    private String studentEmail;
+
+
     // private String parentEmail;
 
     @Column(name = "parent_email")
@@ -38,7 +41,7 @@ public class Outing {
     private String aiFlag;
     private int urgencyScore;
 
-    @Column(length = 1000)
+    @Column(length = 5000)
     private String qrCodeUrl;
 
 

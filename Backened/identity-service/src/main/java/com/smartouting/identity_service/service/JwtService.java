@@ -18,10 +18,11 @@ public class JwtService {
 
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
-    // ── Generate token WITH role claim ────────────────────────────────────────
-    public String generateToken(String userName, String role) {
+    // ── Generate token WITH role + email claims ─────────────────────────────
+    public String generateToken(String userName, String role, String email) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);           // <-- role embedded in JWT
+        claims.put("email", email);         // <-- email embedded in JWT
         return createToken(claims, userName);
     }
 

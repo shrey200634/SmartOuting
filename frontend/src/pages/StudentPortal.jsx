@@ -47,6 +47,7 @@ export default function StudentPortal() {
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const now = new Date();
   const minDT = new Date(now.getTime()+60000).toISOString().slice(0,16);
@@ -73,10 +74,10 @@ export default function StudentPortal() {
     if (new Date(form.outDate)>=new Date(form.returnDate)) return toast("Return date must be after out date","warn");
     setSubmitting(true);
     try {
-      await outingAPI.apply({...form,outDate:new Date(form.outDate).toISOString(),returnDate:new Date(form.returnDate).toISOString()});
+      await outingAPI.apply({...form, studentEmail: user?.email || "", outDate:new Date(form.outDate).toISOString(),returnDate:new Date(form.returnDate).toISOString()});
       toast("Outing request submitted successfully!","success");
       setForm(p=>({...p,reason:"",destination:"",outDate:"",returnDate:"",parentEmail:""}));
-      switchToHistory();
+      setShowSuccessPopup(true);
     } catch (err) {
       const msg=err.message||"Submission failed";
       if (msg.includes("active")||msg.includes("approved")||msg.includes("APPROVED")) toast("You already have an active outing request.","warn");
@@ -249,6 +250,32 @@ export default function StudentPortal() {
           </div>
         )}
       </main>
+
+      {/* SUCCESS POPUP — after submitting outing request */}
+      {showSuccessPopup && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:999,animation:"fadeIn 0.2s ease"}} onClick={()=>{setShowSuccessPopup(false);switchToHistory();}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:20,padding:"36px 32px",maxWidth:420,width:"90%",textAlign:"center",boxShadow:"0 20px 60px rgba(0,0,0,0.15)",animation:"fadeIn 0.3s ease"}}>
+            <div style={{width:64,height:64,borderRadius:"50%",background:"rgba(0,184,148,0.1)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00B894" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h2 style={{fontSize:20,fontWeight:800,color:"#1A1A1A",margin:"0 0 8px"}}>Request Submitted!</h2>
+            <p style={{color:"#6b7280",fontSize:14,lineHeight:1.6,margin:"0 0 20px"}}>
+              Your outing request has been sent to the Warden for approval.
+              <br/><br/>
+              <span style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(0,184,148,0.08)",padding:"8px 14px",borderRadius:10,border:"1px solid rgba(0,184,148,0.15)"}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00B894" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                <span style={{color:"#065f46",fontWeight:600,fontSize:13}}>You'll receive your Outing Pass via email once approved</span>
+              </span>
+            </p>
+            <p style={{color:"#9ca3af",fontSize:12,margin:"0 0 22px"}}>
+              The pass will be sent to <strong style={{color:"#374151"}}>{user?.email || "your registered email"}</strong> with a QR code that you need to show at the gate.
+            </p>
+            <button onClick={()=>{setShowSuccessPopup(false);switchToHistory();}} style={{padding:"12px 32px",background:"var(--accent)",border:"none",borderRadius:10,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 14px rgba(45,212,191,0.3)"}}>
+              View My Requests
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

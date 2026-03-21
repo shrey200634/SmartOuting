@@ -18,24 +18,29 @@ public class OutingRequestDTO {
     @NotBlank(message = "Student ID is mandatory")
     private String studentId;
 
+
     @NotBlank(message = "Student Name is mandatory")
     private String studentName;
 
-    @NotBlank(message = "Reason cannot be empty")
+      @NotBlank(message = "Student Email is required")
+    @Email(message = "Invalid student email format")
+    private String studentEmail;
+
+     @NotBlank(message = "Reason cannot be empty")
     private String reason;
 
     @NotBlank(message = "Destination cannot be empty")
     private String destination;
 
-    @NotNull(message = "Out date is required")
+     @NotNull(message = "Out date is required")
     @Future(message = "Out date must be in the future")
     private LocalDateTime outDate;
 
     @NotNull(message = "Return date is required")
-    @Future(message = "Return date must be in the future")
+      @Future(message = "Return date must be in the future")
     private LocalDateTime returnDate;
 
     @NotBlank(message = "Parent Email is required")
-    @Email(message = "Invalid email format")
+      @Email(message = "Invalid email format")
     private String parentEmail;
 }

@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 public class OutingResponseDTO {
     private Long id;
 
-    // Added these missing fields back so the UI knows the details
     private String studentId;
     private String studentName;
+    private String studentEmail;
     private String reason;
     private String destination;
 

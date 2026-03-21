@@ -83,7 +83,7 @@ public class AuthService {
             throw new RuntimeException("EMAIL_NOT_VERIFIED:" + user.getEmail());
         }
 
-        return jwtService.generateToken(username, user.getRole());
+        return jwtService.generateToken(username, user.getRole(), user.getEmail());
     }
 
     public void validateToken(String token) {
