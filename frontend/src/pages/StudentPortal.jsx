@@ -75,7 +75,6 @@ export default function StudentPortal() {
     setSubmitting(true);
     try {
       await outingAPI.apply({...form, studentEmail: user?.email || "", outDate:new Date(form.outDate).toISOString(),returnDate:new Date(form.returnDate).toISOString()});
-      toast("Outing request submitted successfully!","success");
       setForm(p=>({...p,reason:"",destination:"",outDate:"",returnDate:"",parentEmail:""}));
       setShowSuccessPopup(true);
     } catch (err) {
@@ -89,6 +88,7 @@ export default function StudentPortal() {
   const navItems = [
     { id:"apply", label:"Apply for Outing", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> },
     { id:"history", label:"My Requests", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+    { id:"rules", label:"Rules & Guidelines", icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
   ];
 
   return (
@@ -246,6 +246,67 @@ export default function StudentPortal() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {tab==="rules" && (
+          <div style={{maxWidth:820,animation:"fadeIn 0.3s ease"}}>
+            <h1 style={{fontSize:24,fontWeight:800,color:"var(--text-1)",marginBottom:4}}>Rules & Guidelines</h1>
+            <p style={{color:"var(--text-3)",fontSize:14,marginBottom:28}}>Please read carefully before applying for an outing pass.</p>
+
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+
+              {/* Rule 1 */}
+              <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.03)",display:"flex",gap:16,alignItems:"flex-start"}}>
+                <div style={{width:40,height:40,borderRadius:10,background:"rgba(45,212,191,0.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:"var(--text-1)",marginBottom:4}}>Portal-Only Approvals</div>
+                  <div style={{fontSize:13,color:"var(--text-3)",lineHeight:1.6}}>All leave requests must be submitted and approved exclusively through this portal. No offline or verbal requests will be entertained.</div>
+                </div>
+              </div>
+
+              {/* Rule 2 */}
+              <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.03)",display:"flex",gap:16,alignItems:"flex-start"}}>
+                <div style={{width:40,height:40,borderRadius:10,background:"rgba(52,152,219,0.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3498DB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:"var(--text-1)",marginBottom:4}}>Contact Administration for Issues</div>
+                  <div style={{fontSize:13,color:"var(--text-3)",lineHeight:1.6}}>Facing any problems with your outing request or portal access? Reach out to the administration office directly for assistance.</div>
+                </div>
+              </div>
+
+              {/* Rule 3 — Warning */}
+              <div style={{background:"linear-gradient(135deg, rgba(231,76,60,0.04), rgba(231,76,60,0.02))",border:"1px solid rgba(231,76,60,0.15)",borderRadius:14,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.03)",display:"flex",gap:16,alignItems:"flex-start"}}>
+                <div style={{width:40,height:40,borderRadius:10,background:"rgba(231,76,60,0.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:"#C0392B",marginBottom:4}}>Strict No-Alcohol Policy</div>
+                  <div style={{fontSize:13,color:"var(--text-3)",lineHeight:1.6}}>Returning to campus in an intoxicated or drunk state is a <strong style={{color:"#E74C3C"}}>serious disciplinary offence</strong> and will result in immediate suspension.</div>
+                </div>
+              </div>
+
+              {/* Rule 4 — Curfew */}
+              <div style={{background:"#fff",border:"1px solid var(--border)",borderRadius:14,padding:"20px 24px",boxShadow:"0 1px 4px rgba(0,0,0,0.03)",display:"flex",gap:16,alignItems:"flex-start"}}>
+                <div style={{width:40,height:40,borderRadius:10,background:"rgba(243,156,18,0.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F39C12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:"var(--text-1)",marginBottom:4}}>Day Outing Curfew — 9:30 PM</div>
+                  <div style={{fontSize:13,color:"var(--text-3)",lineHeight:1.6}}>All students on a day outing must return to campus by <strong style={{color:"#F39C12"}}>9:30 PM</strong>. Failure to return on time will be flagged as overdue and may affect future outing privileges.</div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer note */}
+            <div style={{marginTop:22,padding:"14px 18px",background:"var(--accent-dim)",borderRadius:12,display:"flex",alignItems:"center",gap:10}}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span style={{fontSize:13,color:"var(--text-2)",lineHeight:1.5}}>By submitting an outing request, you agree to abide by all the rules listed above. Violations may lead to disciplinary action.</span>
             </div>
           </div>
         )}
