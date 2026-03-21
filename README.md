@@ -1,151 +1,185 @@
-# 🚀 SmartOuting - Digital Gate Pass System
+<div align="center">
 
-A modern, microservices-based gate pass management system for university campuses. Automates student outing approvals with AI-based urgency detection, QR code verification, real-time parent notifications, and automated tracking.
+# 🛡️ SmartOuting
+
+### Intelligent Campus Gate Pass Management System
+
+A microservices-based digital gate pass platform that automates student outing approvals with **AI-powered urgency detection**, **QR code verification**, **real-time parent notifications**, and **automated overdue tracking**.
+
+Built with **Spring Boot** · **React** · **Gemini AI** · **Docker**
 
 ---
 
-## 📋 Table of Contents
+[Features](#-features) · [Architecture](#-architecture) · [Tech Stack](#-tech-stack) · [Quick Start](#-quick-start-docker) · [Manual Setup](#-manual-setup) · [API Reference](#-api-reference) · [Usage Guide](#-usage-guide)
 
-- [Features](#-features)
-- [Architecture](#️-architecture)
-- [Tech Stack](#-tech-stack)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Configuration](#️-configuration)
-- [Running the Application](#-running-the-application)
-- [API Documentation](#-api-documentation)
-- [Usage Guide](#-usage-guide)
-- [Security](#-security)
-- [Troubleshooting](#-troubleshooting)
+</div>
 
 ---
 
 ## ✨ Features
 
-### For Students
-- **Quick Application**: Apply for outing passes with destination, reason, and time details
-- **AI Analysis**: Automatic urgency detection based on reason (medical emergency, routine, etc.)
-- **QR Code Pass**: Receive scannable QR code upon approval
-- **Request History**: View all past and current outing requests
-- **Real-time Status**: Track approval status (Pending → Approved → Out → Returned)
+### 🎓 Student Portal
+- Apply for outing passes with destination, reason, and time details
+- AI-powered urgency analysis (Gemini) auto-categorises requests as Medical, Emergency, Routine, Suspicious, etc.
+- Receive a scannable QR-code pass upon approval
+- Track request status in real-time — Pending → Approved → Out → Returned
+- View complete outing history
+- Built-in **Rules & Guidelines** section with curfew timings and campus policies
 
-### For Wardens
-- **Smart Dashboard**: View all pending requests sorted by urgency
-- **AI Insights**: See urgency scores and flags for quick decision-making
-- **Bulk Actions**: Approve/reject multiple requests
-- **Student History**: Check individual student's outing patterns
-- **Ban Management**: Automatically block students with 3+ overdue returns
+### 🏫 Warden Dashboard
+- Smart dashboard with all pending requests sorted by AI-detected urgency
+- Urgency scores and category flags for quick decision-making
+- Approve or reject requests with optional comments
+- Review individual student outing patterns and history
+- Auto-ban management — students with 3+ overdue returns are automatically blocked
 
-### For Guards
-- **QR Scanner**: Camera-based QR code scanning (no manual typing needed)
-- **Quick Verification**: Instant student details display
-- **One-Click Actions**: Mark students OUT (exit) or IN (return)
-- **Recent Activity**: See last 10 scans for audit trail
+### 🔐 Guard Scanner
+- Camera-based QR code scanning (no manual entry)
+- Instant student verification with outing details
+- One-click Mark OUT (exit) and Mark IN (return)
+- Recent scan activity feed for audit trail
 
-### Automated Features
-- **Parent Email Alerts**: Automatic email when student exits campus
-- **Overdue Tracking**: Cron job checks for late returns every minute
-- **Auto-Blacklisting**: Students with 3 overdue returns get blocked
-- **Time-based Notifications**: Reminders before expected return time
+### ⚙️ Automated Systems
+- **Parent Email Alerts** — automatic notification when a student exits campus
+- **Overdue Tracking** — cron job checks for late returns every minute
+- **Auto-Blacklisting** — 3 overdue returns = automatic outing ban
+- **Email Pass Delivery** — approved outing pass with QR code sent to student email
 
 ---
 
-## 🏗️ Architecture
+## 🏗 Architecture
 
 ```
-┌─────────────┐
-│   Browser   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────┐
-│   API Gateway       │  Port 8989
-│   (Entry Point)     │
-└──────┬──────────────┘
-       │
-       ├──────────────────┬──────────────────┬────────────────┐
-       ▼                  ▼                  ▼                ▼
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│  Service    │  │  Identity   │  │  Outing     │  │  Frontend   │
-│  Registry   │  │  Service    │  │  Service    │  │  (React)    │
-│  (Eureka)   │  │  (Auth)     │  │  (Core)     │  │             │
-│  Port 8761  │  │  Port 8081  │  │  Port 8082  │  │  Port 5173  │
-└─────────────┘  └──────┬──────┘  └──────┬──────┘  └─────────────┘
-                        │                 │
-                        ▼                 ▼
-                   ┌─────────────────────────┐
-                   │      MySQL Database     │
-                   │       Port 3306         │
-                   └─────────────────────────┘
+                         ┌──────────────┐
+                         │   Browser    │
+                         └──────┬───────┘
+                                │
+                                ▼
+                   ┌────────────────────────┐
+                   │     Frontend (React)   │  Port 80
+                   │     Nginx · Vite SPA   │
+                   └────────────┬───────────┘
+                                │
+                                ▼
+                   ┌────────────────────────┐
+                   │      API Gateway       │  Port 8989
+                   │  Route · Load Balance  │
+                   └────────────┬───────────┘
+                                │
+               ┌────────────────┼────────────────┐
+               ▼                ▼                 ▼
+     ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+     │   Identity   │  │    Outing    │  │   Service    │
+     │   Service    │  │   Service    │  │   Registry   │
+     │  Auth · JWT  │  │ Core · Mail  │  │   (Eureka)   │
+     │  Port 8081   │  │  Port 8082   │  │  Port 8761   │
+     └──────┬───────┘  └──────┬───────┘  └──────────────┘
+            │                 │
+            ▼                 ▼
+     ┌─────────────────────────────┐
+     │       MySQL 8.0 Database   │
+     │         Port 3306          │
+     └─────────────────────────────┘
 ```
 
-### Services
-
-1. **Service Registry (Eureka)** - Service discovery and health monitoring
-2. **API Gateway** - Request routing, load balancing, rate limiting
-3. **Identity Service** - JWT authentication, user management, RBAC
-4. **Outing Service** - Business logic, QR generation, email notifications
-5. **Frontend** - React SPA with role-based UI
+| Service | Responsibility |
+|---------|---------------|
+| **Service Registry** | Eureka-based service discovery and health monitoring |
+| **API Gateway** | Request routing, load balancing across microservices |
+| **Identity Service** | JWT authentication, user registration, role-based access |
+| **Outing Service** | Business logic, Gemini AI analysis, QR generation, email delivery |
+| **Frontend** | React SPA with role-based dashboards for Student, Warden, and Guard |
 
 ---
 
 ## 💻 Tech Stack
 
 ### Backend
-- **Language**: Java 17
-- **Framework**: Spring Boot 3.2.x
-- **Microservices**: Spring Cloud (Netflix Eureka, Gateway)
-- **Security**: Spring Security 6, JWT
-- **Database**: MySQL 8.0
-- **ORM**: Spring Data JPA (Hibernate)
-- **Build Tool**: Gradle 8.x
+| Technology | Purpose |
+|-----------|---------|
+| Java 17 | Core language |
+| Spring Boot 3.2.x | Application framework |
+| Spring Cloud (Eureka, Gateway) | Microservices infrastructure |
+| Spring Security 6 + JWT | Authentication & authorisation |
+| Spring Data JPA (Hibernate) | ORM & database access |
+| MySQL 8.0 | Relational database |
+| Google Gemini AI | Outing reason analysis & urgency scoring |
+| ZXing | QR code generation |
+| Spring Mail (SMTP) | Email notifications |
+| Gradle 8.x | Build tool |
 
 ### Frontend
-- **Framework**: React 19.2.4
-- **Build Tool**: Vite 8.0
-- **QR Scanner**: html5-qrcode 2.3.8
-- **HTTP Client**: Fetch API
-- **Styling**: Inline CSS (custom design system)
+| Technology | Purpose |
+|-----------|---------|
+| React 19 | UI framework |
+| Vite 8 | Build tool & dev server |
+| html5-qrcode | Camera-based QR scanning |
+| Fetch API | HTTP client |
+| Custom Design System | Inline CSS with CSS variables |
 
-### Libraries & Tools
-- **QR Generation**: ZXing (Zebra Crossing)
-- **Email**: Spring Mail (SMTP)
-- **Scheduling**: Spring Task Scheduler
-- **Data Validation**: Jakarta Validation
-- **Boilerplate Reduction**: Lombok
-
----
-
-## 📦 Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Java Development Kit (JDK) 17 or higher**
-  ```bash
-  java -version
-  ```
-
-- **MySQL Server 8.0+**
-  ```bash
-  mysql --version
-  ```
-
-- **Node.js 18+ and npm**
-  ```bash
-  node -v
-  npm -v
-  ```
-
-- **Git**
-  ```bash
-  git --version
-  ```
-
-- **Gmail Account** with App Password enabled (for email notifications)
+### DevOps
+| Technology | Purpose |
+|-----------|---------|
+| Docker & Docker Compose | Containerised deployment |
+| Nginx | Production frontend serving |
 
 ---
 
-## 🔧 Installation
+## 🐳 Quick Start (Docker)
+
+The fastest way to get SmartOuting running. Requires **Docker** and **Docker Compose**.
+
+### 1. Clone & Configure
+
+```bash
+git clone https://github.com/shrey200634/SmartOuting.git
+cd SmartOuting
+```
+
+Create a `.env` file in the project root:
+
+```env
+DB_PASSWORD=your_mysql_root_password
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_16_char_app_password
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+### 2. Launch Everything
+
+```bash
+docker-compose up -d --build
+```
+
+### 3. Access the App
+
+| Interface | URL |
+|-----------|-----|
+| Frontend | http://localhost |
+| API Gateway | http://localhost:8989 |
+| Eureka Dashboard | http://localhost:8761 |
+
+### Rebuild a Single Service
+
+If you make changes to only one service (e.g., frontend):
+
+```bash
+docker-compose up -d --build frontend
+```
+
+---
+
+## 🔧 Manual Setup
+
+For development without Docker.
+
+### Prerequisites
+
+- **JDK 17+** — `java -version`
+- **MySQL 8.0+** — `mysql --version`
+- **Node.js 18+** — `node -v`
+- **Git** — `git --version`
+- **Gmail Account** with App Password enabled
 
 ### 1. Clone the Repository
 
@@ -157,63 +191,32 @@ cd SmartOuting
 ### 2. Database Setup
 
 ```sql
--- Connect to MySQL
 mysql -u root -p
 
--- Create database
 CREATE DATABASE outing_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- Create user (optional but recommended)
 CREATE USER 'smartouting'@'localhost' IDENTIFIED BY 'your_password';
 GRANT ALL PRIVILEGES ON outing_db.* TO 'smartouting'@'localhost';
 FLUSH PRIVILEGES;
-
--- Exit MySQL
 EXIT;
 ```
 
-### 3. Backend Configuration
+### 3. Configure Backend Services
 
-Create `application.yml` files in each service (see [Configuration](#️-configuration) section below).
+Create configuration files in each service's `src/main/resources/` directory.
 
-**Important**: Never commit `application.yml` to Git. Add to `.gitignore`:
-
-```gitignore
-**/application.yml
-**/application.properties
-**/application-*.yml
-```
-
-### 4. Frontend Setup
-
-```bash
-cd frontend
-npm install
-```
-
----
-
-## ⚙️ Configuration
-
-### Service Registry (`service-registry/src/main/resources/application.properties`)
-
+**Service Registry** — `application.properties`
 ```properties
-# Server Configuration
 server.port=8761
 spring.application.name=service-registry
-
-# Eureka Configuration
 eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false
 eureka.server.enable-self-preservation=false
 ```
 
-### API Gateway (`api-gateway/src/main/resources/application.yml`)
-
+**API Gateway** — `application.yml`
 ```yaml
 server:
   port: 8989
-
 spring:
   application:
     name: api-gateway
@@ -228,59 +231,41 @@ spring:
           uri: lb://outing-service
           predicates:
             - Path=/outing/**
-
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 ```
 
-### Identity Service (`identity-service/src/main/resources/application.properties`)
-
+**Identity Service** — `application.properties`
 ```properties
-# Server Configuration
 server.port=8081
 spring.application.name=identity-service
-
-# Database Configuration
 spring.datasource.url=jdbc:mysql://localhost:3306/outing_db
 spring.datasource.username=YOUR_DB_USERNAME
 spring.datasource.password=YOUR_DB_PASSWORD
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-# JPA Configuration
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-
-# Eureka Configuration
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 ```
 
-### Outing Service (`outing-service/src/main/resources/application.yml`)
-
+**Outing Service** — `application.yml`
 ```yaml
 server:
   port: 8082
-
 spring:
   application:
     name: outing-service
-  
   datasource:
     url: jdbc:mysql://localhost:3306/outing_db
     username: YOUR_DB_USERNAME
     password: YOUR_DB_PASSWORD
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-  
   mail:
     host: smtp.gmail.com
     port: 587
@@ -292,84 +277,60 @@ spring:
           auth: true
           starttls:
             enable: true
-
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 ```
 
-**Get Gmail App Password:**
-1. Go to Google Account → Security
-2. Enable 2-Step Verification
-3. Generate App Password (select "Mail" and "Other")
-4. Copy the 16-character password (no spaces)
+> **Getting a Gmail App Password:** Google Account → Security → 2-Step Verification → App Passwords → Select "Mail" → Copy the 16-character code.
 
----
-
-## 🚀 Running the Application
-
-### Backend Services
-
-**Important**: Start services in this exact order and wait for each to fully start before proceeding to the next.
-
-#### 1. Start Service Registry (Eureka)
+### 4. Start Backend Services (in order)
 
 ```bash
-cd service-registry
-./gradlew bootRun
+# Terminal 1 — Service Registry
+cd Backened/service-registry && ./gradlew bootRun
+# Wait for "Started ServiceRegistryApplication" — verify at http://localhost:8761
+
+# Terminal 2 — API Gateway
+cd Backened/api-gateway && ./gradlew bootRun
+
+# Terminal 3 — Identity Service
+cd Backened/identity-service && ./gradlew bootRun
+
+# Terminal 4 — Outing Service
+cd Backened/outing-service && ./gradlew bootRun
 ```
 
-Wait for: `Started ServiceRegistryApplication` (port 8761)  
-Verify: http://localhost:8761
-
-#### 2. Start API Gateway
-
-```bash
-cd api-gateway
-./gradlew bootRun
-```
-
-Wait for: `Started ApiGatewayApplication` (port 8989)
-
-#### 3. Start Identity Service
-
-```bash
-cd identity-service
-./gradlew bootRun
-```
-
-Wait for: `Started IdentityServiceApplication` (port 8081)
-
-#### 4. Start Outing Service
-
-```bash
-cd outing-service
-./gradlew bootRun
-```
-
-Wait for: `Started OutingServiceApplication` (port 8082)
-
-### Frontend
+### 5. Start Frontend
 
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-Open: http://localhost:5173
+Open http://localhost:5173
 
 ---
 
-## 📡 API Documentation
+## 📡 API Reference
 
-### Authentication Endpoints
+All endpoints (except auth) require a JWT token:
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
 
-#### Register User
-```http
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/token` | Login and receive JWT |
+
+**Register:**
+```json
 POST /auth/register
-Content-Type: application/json
-
 {
   "name": "john_doe",
   "email": "john@example.com",
@@ -378,210 +339,148 @@ Content-Type: application/json
 }
 ```
 
-**Response:**
+**Login:**
 ```json
-{
-  "message": "User registered successfully"
-}
-```
-
-#### Login
-```http
 POST /auth/token
-Content-Type: application/json
-
 {
   "username": "john_doe",
   "password": "SecurePass123"
 }
+→ { "token": "eyJhbG...", "name": "john_doe", "role": "STUDENT" }
 ```
 
-**Response:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "name": "john_doe",
-  "role": "STUDENT"
-}
-```
+### Outing Management
 
-### Outing Endpoints
-
-All endpoints require JWT token in header:
-```
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Apply for Outing
-```http
-POST /outing/apply
-Content-Type: application/json
-Authorization: Bearer YOUR_JWT_TOKEN
-
-{
-  "studentId": "ST12345",
-  "studentName": "John Doe",
-  "parentEmail": "parent@example.com",
-  "reason": "Going to hospital for checkup",
-  "destination": "City Hospital",
-  "outDate": "2024-03-20T10:00:00",
-  "returnDate": "2024-03-20T18:00:00"
-}
-```
-
-#### Get Student History
-```http
-GET /outing/student/ST12345
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Approve Outing (Warden)
-```http
-PUT /outing/approve/42?comment=Approved for medical reasons
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Scan Out (Guard)
-```http
-PUT /outing/scan/42
-Authorization: Bearer YOUR_JWT_TOKEN
-```
-
-#### Scan In (Guard)
-```http
-PUT /outing/return/42
-Authorization: Bearer YOUR_JWT_TOKEN
-```
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| `POST` | `/outing/apply` | Student | Submit outing request |
+| `GET` | `/outing/student/{id}` | Student | View request history |
+| `GET` | `/outing/all` | Warden | View all requests |
+| `PUT` | `/outing/approve/{id}?comment=...` | Warden | Approve a request |
+| `PUT` | `/outing/reject/{id}?comment=...` | Warden | Reject a request |
+| `PUT` | `/outing/scan/{id}` | Guard | Mark student OUT |
+| `PUT` | `/outing/return/{id}` | Guard | Mark student IN |
 
 ---
 
 ## 📱 Usage Guide
 
-### For Students
+### Student Workflow
+1. **Register** with role `STUDENT` → **Login**
+2. Navigate to **Apply for Outing** → fill details → **Submit**
+3. AI analyses your reason and assigns an urgency category
+4. Wait for Warden approval → receive **email with QR code pass**
+5. Show QR code to the Guard at the gate
+6. Check **Rules & Guidelines** tab for campus outing policies
 
-1. **Register Account**
-   - Click "Create Account"
-   - Enter details with role "STUDENT"
-   - Login with credentials
+### Warden Workflow
+1. **Login** with role `WARDEN`
+2. Review pending requests on the dashboard — sorted by AI urgency
+3. Check AI flags (Medical Emergency, Suspicious, Routine, etc.)
+4. **Approve** or **Reject** with an optional comment
+5. Monitor student history and overdue patterns
 
-2. **Apply for Outing**
-   - Click "Apply for Outing"
-   - Fill in destination, reason, dates
-   - Submit (AI analyzes urgency)
-
-3. **Get QR Code**
-   - Wait for warden approval
-   - Go to "My Requests" tab
-   - QR code appears on approved request
-   - Show QR at gate
-
-### For Wardens
-
-1. **Login as Warden**
-   - Use credentials with "WARDEN" role
-
-2. **Review Requests**
-   - See all pending requests
-   - AI flags show urgency (🔴 Medical, 🟡 Urgent, 🟢 Routine)
-   - View student history
-
-3. **Approve/Reject**
-   - Click on request to review
-   - Add comment (optional)
-   - Click "Approve" or "Reject"
-
-### For Guards
-
-1. **Login as Guard**
-   - Use credentials with "GUARD" role
-
-2. **Scan QR Code**
-   - Click "📷 Scan QR Code"
-   - Point camera at student's QR
-   - System auto-extracts ID
-
-3. **Mark Student Out**
-   - Verify details displayed
-   - Click "Mark OUT"
-   - Parent email sent automatically
-
-4. **Mark Student Return**
-   - Scan QR again when student returns
-   - Click "Mark IN"
-   - Status updated to RETURNED
+### Guard Workflow
+1. **Login** with role `GUARD`
+2. Click **Scan QR Code** → point camera at student's pass
+3. Verify student details → click **Mark OUT**
+4. When student returns → scan again → click **Mark IN**
+5. Parent email notification is sent automatically on exit
 
 ---
 
 ## 🔒 Security
 
-### Authentication
-- JWT-based stateless authentication
-- Tokens expire after 24 hours
-- Password hashing with BCrypt
-- Role-based access control (RBAC)
-
-### Authorization
-- **STUDENT**: Can apply, view own history
-- **WARDEN**: Can approve/reject, view all requests
-- **GUARD**: Can scan QR, mark OUT/IN (IP whitelisted)
-
-### Data Protection
-- SQL injection prevention (JPA/Hibernate)
-- XSS protection (input sanitization)
-- CORS configuration (specific origins only)
-- HTTPS recommended for production
+| Layer | Implementation |
+|-------|---------------|
+| Authentication | JWT tokens with 24-hour expiry |
+| Password Storage | BCrypt hashing |
+| Authorisation | Role-based access control (STUDENT, WARDEN, GUARD) |
+| SQL Injection | Prevented via JPA/Hibernate parameterised queries |
+| XSS | Input sanitisation |
+| CORS | Configured for specific allowed origins |
 
 ### Best Practices
-- Never commit `application.yml` to Git
-- Use environment variables for sensitive data
-- Rotate JWT secret regularly
-- Enable MySQL SSL in production
-- Use Gmail App Password (not account password)
+- Never commit `application.yml` or `.env` to version control
+- Use environment variables for all secrets in production
+- Rotate JWT signing keys regularly
+- Enable MySQL SSL for production deployments
+- Use Gmail App Passwords (never your account password)
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Backend Won't Start
+### Docker Issues
 
-**Issue**: `Port already in use`
+**"Cannot connect to Docker daemon"**
+→ Open **Docker Desktop** and wait until it's fully running before running any `docker-compose` commands.
+
+**Service won't start in Docker**
+→ Check logs: `docker-compose logs <service-name>` (e.g., `docker-compose logs outing-service`)
+
+### Backend Issues
+
+**Port already in use**
 ```bash
-# Find process using port
-lsof -i :8761  # or 8081, 8082, 8989
-# Kill process
-kill -9 PID
+# macOS / Linux
+lsof -i :8761
+
+# Windows
+netstat -ano | findstr :8761
 ```
 
-**Issue**: `Connection refused` to MySQL
-- Check MySQL is running: `sudo systemctl status mysql`
-- Verify credentials in `application.yml`
-- Ensure database `outing_db` exists
+**MySQL connection refused**
+→ Verify MySQL is running and that `outing_db` exists with correct credentials.
 
 ### Frontend Issues
 
-**Issue**: `Module not found: html5-qrcode`
+**Module not found: html5-qrcode**
 ```bash
-cd frontend
-npm install html5-qrcode
+cd frontend && npm install html5-qrcode
 ```
 
-**Issue**: Camera not working
-- Use HTTPS (required for camera access)
-- For local testing: Use `ngrok http 5173`
-- Check browser permissions
+**Camera not working for QR scan**
+→ Camera access requires HTTPS. For local dev, use `ngrok http 5173` or test on `localhost`.
 
-### QR Code Not Displaying
+---
 
-**Issue**: Broken image icon
-- Verify backend fix applied (data URI prefix)
-- Check browser console for errors
-- Try hard refresh (Ctrl+F5)
+## 📂 Project Structure
+
+```
+SmartOuting/
+├── docker-compose.yml
+├── .env                          # Secrets (not committed)
+├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── StudentPortal.jsx     # Student dashboard + rules
+│   │   │   ├── WardenDashboard.jsx   # Warden approval panel
+│   │   │   ├── GuardScanner.jsx      # QR scanning interface
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   └── RoleSelector.jsx
+│   │   ├── components/
+│   │   │   └── Toast.jsx
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx
+│   │   └── utils/
+│   │       └── api.js
+│   └── package.json
+└── Backened/
+    ├── service-registry/         # Eureka server
+    ├── api-gateway/              # Spring Cloud Gateway
+    ├── identity-service/         # Auth + user management
+    └── outing-service/           # Core logic + AI + email
+```
 
 ---
 
 ## 👨‍💻 Author
 
-**Shrey Dave**  
+**Shrey Dave**
 B.Tech in Cloud Computing and Automation
 
 ---
@@ -592,4 +491,9 @@ This project is licensed under the MIT License.
 
 ---
 
-**Made with ❤️ for university campus security**
+<div align="center">
+
+**Made with ❤️ for smarter, safer campus management**
+
+</div>
+
